@@ -1,0 +1,40 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":timezone(Asia/Tokyo)",
+    ":approveMajorUpdates",
+    ":automergePatch",
+    ":automergeTypes",
+    ":automergeLinters",
+    ":automergeTesters",
+    ":prHourlyLimitNone",
+    ":maintainLockFilesWeekly",
+    ":semanticCommits"
+  ],
+  "labels": ["renovate"],
+  "schedule": ["after 9am and before 8pm every weekday"],
+  "automergeType": "pr",
+  "automergeStrategy": "squash",
+  "packageRules": [
+    {
+      "description": "Automerge all devDependency updates",
+      "matchDepTypes": ["devDependencies"],
+      "automerge": true
+    },
+    {
+      "description": "Group React and React Native packages",
+      "matchPackagePatterns": ["^react", "^@react-navigation"],
+      "groupName": "React ecosystem",
+      "labels": ["react-ecosystem"],
+      "automerge": false
+    },
+    {
+      "description": "Group Expo packages",
+      "matchPackagePatterns": ["^expo", "^@expo"],
+      "groupName": "Expo ecosystem",
+      "labels": ["expo-ecosystem"],
+      "automerge": false
+    }
+  ]
+}
