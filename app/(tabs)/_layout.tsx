@@ -4,7 +4,7 @@ export default function TabLayout() {
   return (
     <Tabs>
       <Tabs.Screen
-        name="recipe"
+        name="index"
         options={{
           title: "My recipes",
         }}
