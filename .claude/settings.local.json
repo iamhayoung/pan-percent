@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npx biome:*)",
+      "Bash(npx expo start:*)",
+      "Bash(npx expo-doctor)",
+      "Bash(npx expo:*)"
+    ]
+  }
+}

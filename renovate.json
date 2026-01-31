@@ -1,0 +1,50 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":timezone(Asia/Tokyo)",
+    ":approveMajorUpdates",
+    ":automergePatch",
+    ":automergeMinor",
+    ":automergeTypes",
+    ":automergeLinters",
+    ":automergeTesters",
+    ":prHourlyLimitNone",
+    ":maintainLockFilesWeekly",
+    ":semanticCommits"
+  ],
+  "labels": ["renovate"],
+  "schedule": ["after 9am and before 8pm every weekday"],
+  "automergeType": "pr",
+  "automergeStrategy": "squash",
+  "packageRules": [
+    {
+      "description": "Automerge all devDependency updates",
+      "matchDepTypes": ["devDependencies"],
+      "automerge": true
+    },
+    {
+      "description": "Group Expo + React ecosystem",
+      "matchPackagePatterns": [
+        "^expo",
+        "^@expo",
+        "^react",
+        "^@react-navigation"
+      ],
+      "groupName": "Expo + React ecosystem",
+      "labels": ["expo-react-ecosystem"]
+    },
+    {
+      "description": "Expo + React major upgrades → require manual merge",
+      "matchPackagePatterns": [
+        "^expo",
+        "^@expo",
+        "^react",
+        "^@react-navigation"
+      ],
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "labels": ["expo-react-major"]
+    }
+  ]
+}
