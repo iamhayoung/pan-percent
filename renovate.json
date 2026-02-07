@@ -3,12 +3,6 @@
   "extends": [
     "config:recommended",
     ":timezone(Asia/Tokyo)",
-    ":approveMajorUpdates",
-    ":automergePatch",
-    ":automergeMinor",
-    ":automergeTypes",
-    ":automergeLinters",
-    ":automergeTesters",
     ":prHourlyLimitNone",
     ":maintainLockFilesWeekly",
     ":semanticCommits"
@@ -23,17 +17,7 @@
   "automergeStrategy": "squash",
   "packageRules": [
     {
-      "description": "Automerge all devDependency updates (except @types/react)",
-      "matchDepTypes": [
-        "devDependencies"
-      ],
-      "automerge": true,
-      "matchPackageNames": [
-        "!@types/react"
-      ]
-    },
-    {
-      "description": "Disable React core packages auto-updates - must follow Expo SDK compatibility",
+      "description": "Disable React core packages - must follow Expo SDK compatibility",
       "matchPackageNames": [
         "react",
         "react-dom",
@@ -43,128 +27,78 @@
       "enabled": false
     },
     {
-      "description": "Expo SDK - automerge patch only (highest priority)",
+      "description": "Expo SDK - group all updates together",
       "matchPackageNames": [
         "expo"
-      ],
-      "matchUpdateTypes": [
-        "patch"
       ],
       "groupName": "Expo SDK",
       "labels": [
         "expo-sdk"
       ],
-      "prPriority": 10,
-      "automerge": true
-    },
-    {
-      "description": "Expo SDK - minor/major require manual review",
-      "matchPackageNames": [
-        "expo"
-      ],
-      "matchUpdateTypes": [
-        "minor",
-        "major"
-      ],
-      "automerge": false,
-      "labels": [
-        "expo-sdk-major-minor"
-      ],
       "prPriority": 10
     },
     {
-      "description": "Expo packages - automerge patch only",
-      "matchUpdateTypes": [
-        "patch"
+      "description": "Expo packages - group all updates together",
+      "matchPackageNames": [
+        "/^@expo//",
+        "/^expo-/"
+      ],
+      "excludePackageNames": [
+        "expo"
       ],
       "groupName": "Expo packages",
       "labels": [
         "expo-packages"
       ],
-      "prPriority": 8,
-      "automerge": true,
-      "matchPackageNames": [
-        "/^@expo//",
-        "/^expo-/"
-      ]
+      "prPriority": 8
     },
     {
-      "description": "Expo packages - minor/major require manual review",
-      "matchUpdateTypes": [
-        "minor",
-        "major"
-      ],
-      "automerge": false,
-      "labels": [
-        "expo-packages-major-minor"
-      ],
-      "prPriority": 8,
+      "description": "React Navigation - group all updates together",
       "matchPackageNames": [
-        "/^@expo//",
-        "/^expo-/"
-      ]
-    },
-    {
-      "description": "React Navigation - automerge patch only",
-      "matchUpdateTypes": [
-        "patch"
+        "/^@react-navigation/"
       ],
       "groupName": "React Navigation",
       "labels": [
         "react-navigation"
       ],
-      "prPriority": 6,
-      "automerge": true,
-      "matchPackageNames": [
-        "/^@react-navigation/"
-      ]
+      "prPriority": 6
     },
     {
-      "description": "React Navigation - minor/major require manual review",
-      "matchUpdateTypes": [
-        "minor",
-        "major"
-      ],
-      "automerge": false,
-      "labels": [
-        "react-navigation-major-minor"
-      ],
-      "prPriority": 6,
+      "description": "React Native ecosystem - group all updates together",
       "matchPackageNames": [
-        "/^@react-navigation/"
-      ]
-    },
-    {
-      "description": "React Native ecosystem - automerge patch only",
-      "matchUpdateTypes": [
-        "patch"
+        "/^react-native-/",
+        "/^@react-native/"
       ],
       "groupName": "React Native ecosystem",
       "labels": [
         "react-native-ecosystem"
       ],
-      "prPriority": 5,
-      "automerge": true,
-      "matchPackageNames": [
-        "/^react-native-/",
-        "/^@react-native/"
-      ]
+      "prPriority": 5
     },
     {
-      "description": "React Native ecosystem - minor/major require manual review",
+      "description": "Automerge non-breaking changes (patch and minor)",
       "matchUpdateTypes": [
-        "minor",
+        "patch",
+        "minor"
+      ],
+      "automerge": true
+    },
+    {
+      "description": "Major updates require manual review",
+      "matchUpdateTypes": [
         "major"
       ],
-      "automerge": false,
-      "labels": [
-        "react-native-ecosystem-major-minor"
+      "automerge": false
+    },
+    {
+      "description": "Automerge devDependencies (except @types/react)",
+      "matchDepTypes": [
+        "devDependencies"
       ],
-      "prPriority": 5,
       "matchPackageNames": [
-        "/^react-native-/",
-        "/^@react-native/"
-      ]
+        "!@types/react"
+      ],
+      "automerge": true
     }
   ]
 }
