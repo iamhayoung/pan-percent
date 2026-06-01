@@ -8,6 +8,7 @@
     ":semanticCommits"
   ],
   "labels": ["renovate"],
+  "rangeStrategy": "pin",
   "schedule": ["after 9am and before 8pm every weekday"],
   "automergeType": "pr",
   "automergeStrategy": "squash",
