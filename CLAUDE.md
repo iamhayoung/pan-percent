@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Pan-percent is a cross-platform recipe management mobile app built with Expo (React Native). The name references bread recipes (パン/pan in Japanese).
 
-**Tech Stack:** React 19.1, React Native 0.81, Expo ~54, TypeScript ~5.9, Expo Router ~6, Biome (linter/formatter)
+**Tech Stack:** React 19.1, React Native 0.81, Expo ~54, TypeScript ~5.9, Expo Router ~6, Biome (linter/formatter), jest-expo + @testing-library/react-native (tests), expo-localization (i18n)
 
 ## Development Commands
 
@@ -19,6 +19,8 @@ npx expo start --web # Start directly in web browser
 npm run lint         # Run Biome linter (biome check .)
 npm run lint:fix     # Auto-fix lint issues (biome check --write .)
 npm run format       # Format code (biome format --write .)
+npm test             # Run tests (jest via jest-expo preset)
+npm run test:watch   # Run tests in watch mode
 ```
 
 ## Architecture
@@ -29,13 +31,15 @@ Routes are defined by the file structure in `app/`:
 
 ```
 app/
-├── _layout.tsx           # Root Stack navigator
-├── (tabs)/               # Tab group (bottom navigation)
-│   ├── _layout.tsx       # Tab navigator config
-│   ├── index.tsx         # "My recipes" tab (home screen)
-│   └── settings.tsx      # "Settings" tab
+├── _layout.tsx           # Root Stack (wrapped in LanguageProvider)
+├── (tabs)/               # Tab group (recipes / settings)
+│   ├── _layout.tsx
+│   ├── index.tsx         # Recipe list
+│   └── settings.tsx      # Settings
 ├── recipe/
-│   └── register.tsx      # Recipe registration screen (modal/push)
+│   ├── new.tsx           # Create
+│   ├── [id].tsx          # Detail (scaling)
+│   └── edit/[id].tsx     # Edit
 └── +not-found.tsx        # 404 fallback
 ```
 
@@ -48,11 +52,23 @@ app/
 ```
 components/
 └── recipe/
-    └── register/
+    └── new/
         └── Thumbnail.tsx   # Feature-scoped components
 ```
 
 Reusable components go in `components/`. Feature-specific components are nested under feature directories.
+
+Logic lives in `lib/` as pure functions, with domain types in `types/`:
+
+```
+lib/
+├── recipes/   # repository layer (AsyncStorage CRUD)
+├── bakers/    # baker's percentage calculation (pure functions)
+├── i18n/      # typed dictionary & language hook (useT)
+└── theme/     # light/dark tokens & useTheme
+
+types/         # domain types (Recipe, etc.)
+```
 
 ### Path Aliases
 
@@ -60,6 +76,30 @@ Use `@/` for imports from the project root:
 ```typescript
 import { Component } from "@/components/Component";
 ```
+
+## Branch Strategy
+
+- Branch off `develop` per unit of work (feature branch)
+- feature → review → merge into `develop`
+- Release: develop → stage → main (tag `vX.Y.Z` on `main`)
+
+## i18n / Theme
+
+- i18n: typed dictionary (en/ja/ko) + `expo-localization` device following. Resolve via `useT()`, fall back to en
+- Theme: `useTheme()` follows `useColorScheme()` and returns light/dark tokens
+
+## Supported Platforms
+
+- iOS 16 range / Android 11–12 range (within Expo 54 support)
+- iOS 26+ supports Liquid Glass (branch via `isLiquidGlassAvailable()`, flat below)
+- Account for all screen sizes incl. foldables (safe-area, avoid fixed px widths, 1–2 column responsive)
+
+## UI/UX Guidelines
+
+- Calm warm palette (neutral + one accent). No cool colors (indigo/violet/purple)
+- Card radius 12px (no 8px; 20px for large surfaces)
+- Filled icons (no outline). No gradients or excessive effects
+- Minimal layouts keeping only essentials. Meet WCAG AA in both modes
 
 ## Configuration Notes
 
