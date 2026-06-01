@@ -5,10 +5,10 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react-native";
+import RecipesScreen from "@/app/(tabs)/index";
 import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
 import { save } from "@/lib/recipes/recipeRepository";
 import type { RecipeDraft } from "@/types/recipe";
-import RecipesScreen from "./index";
 
 jest.mock("expo-router", () => ({ useRouter: () => ({ push: jest.fn() }) }));
 jest.mock("@react-navigation/native", () => {

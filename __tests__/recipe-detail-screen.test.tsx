@@ -6,10 +6,10 @@ import {
   waitFor,
 } from "@testing-library/react-native";
 import { Alert } from "react-native";
+import RecipeDetailScreen from "@/app/recipe/[id]";
 import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
 import { list, save } from "@/lib/recipes/recipeRepository";
 import type { RecipeDraft } from "@/types/recipe";
-import RecipeDetailScreen from "./[id]";
 
 const mockBack = jest.fn();
 jest.mock("expo-router", () => ({
