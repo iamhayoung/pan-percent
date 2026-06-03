@@ -1,11 +1,12 @@
 import { useRouter } from "expo-router";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { Swipeable } from "react-native-gesture-handler";
 import { RecipeCard } from "@/components/recipe/RecipeCard";
 import { useT } from "@/lib/i18n/LanguageProvider";
-import { save } from "@/lib/recipes/recipeRepository";
+import { remove, save } from "@/lib/recipes/recipeRepository";
 import { useRecipes } from "@/lib/recipes/useRecipes";
 import { useTheme } from "@/lib/theme/useTheme";
-import type { RecipeDraft } from "@/types/recipe";
+import type { Recipe, RecipeDraft } from "@/types/recipe";
 
 // HACK: temporary dev seed. Replace with router.push("/recipe/new") in feature/recipe-form.
 const SAMPLE: RecipeDraft = {
@@ -29,6 +30,36 @@ export default function RecipesScreen() {
     await reload();
   };
 
+  const deleteRecipe = async (id: string) => {
+    await remove(id);
+    await reload();
+  };
+
+  const renderItem = ({ item }: { item: Recipe }) => (
+    <Swipeable
+      renderRightActions={() => (
+        <Pressable
+          testID={`delete-recipe-${item.id}`}
+          accessibilityRole="button"
+          onPress={() => deleteRecipe(item.id)}
+          style={[
+            styles.deleteAction,
+            { backgroundColor: theme.colors.accent },
+          ]}
+        >
+          <Text style={{ color: theme.colors.accentText }}>{t("delete")}</Text>
+        </Pressable>
+      )}
+    >
+      <RecipeCard
+        recipe={item}
+        onPress={() =>
+          router.push({ pathname: "/recipe/[id]", params: { id: item.id } })
+        }
+      />
+    </Swipeable>
+  );
+
   return (
     <View
       style={[styles.container, { backgroundColor: theme.colors.background }]}
@@ -44,17 +75,7 @@ export default function RecipesScreen() {
           data={recipes}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
-          renderItem={({ item }) => (
-            <RecipeCard
-              recipe={item}
-              onPress={() =>
-                router.push({
-                  pathname: "/recipe/[id]",
-                  params: { id: item.id },
-                })
-              }
-            />
-          )}
+          renderItem={renderItem}
         />
       )}
       <Pressable
@@ -76,6 +97,13 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   empty: { flex: 1, alignItems: "center", justifyContent: "center" },
   list: { padding: 16, gap: 12 },
+  deleteAction: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    marginVertical: 0,
+  },
   fab: {
     position: "absolute",
     right: 24,

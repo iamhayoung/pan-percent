@@ -64,4 +64,17 @@ describe("RecipesScreen", () => {
       expect(screen.getByTestId("recipe-card-uuid-x")).toBeTruthy(),
     );
   });
+
+  it("deletes a recipe from the swipe action", async () => {
+    await save(draft("Baguette"));
+
+    renderWithProvider(<RecipesScreen />);
+    await waitFor(() => expect(screen.getByText("Baguette")).toBeTruthy());
+
+    fireEvent.press(screen.getByTestId("delete-recipe-uuid-x"));
+
+    await waitFor(() =>
+      expect(screen.getByText("No recipes yet")).toBeTruthy(),
+    );
+  });
 });
