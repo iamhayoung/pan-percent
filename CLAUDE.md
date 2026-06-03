@@ -77,6 +77,12 @@ Use `@/` for imports from the project root:
 import { Component } from "@/components/Component";
 ```
 
+## Testing
+
+- TDD with jest-expo + @testing-library/react-native; run `npm test`
+- Co-locate tests next to source (`foo.ts` + `foo.test.ts`) — the default for `lib/`, `components/`, etc.
+- **Exception — route screen tests:** do NOT co-locate tests inside `app/`. Expo Router bundles every file under `app/` via `require.context` (it excludes only `+api`/`+html`/`+middleware`, not `.test.`), so a co-located test pulls @testing-library into the app bundle and breaks it — even under `app/__tests__/` (still inside the scanned root). Put screen/route tests in the top-level `__tests__/` directory instead, importing screens via `@/app/...`.
+
 ## Branch Strategy
 
 - Branch off `develop` per unit of work (feature branch)

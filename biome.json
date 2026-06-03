@@ -37,6 +37,7 @@
       "hooks/**",
       "lib/**",
       "types/**",
+      "__tests__/**",
       "scripts/**",
       "*.json",
       "*.ts"

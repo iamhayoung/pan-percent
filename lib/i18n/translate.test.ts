@@ -12,4 +12,10 @@ describe("translate", () => {
     expect(translate("ja", "tabRecipes")).toBe("レシピ");
     expect(translate("ko", "tabRecipes")).toBe("레시피");
   });
+
+  it("has the recipe screen keys in every language", () => {
+    expect(translate("ja", "recipesEmpty")).toBe("レシピがありません");
+    expect(translate("ko", "delete")).toBe("삭제");
+    expect(translate("en", "targetFlourGrams")).toBe("Target flour (g)");
+  });
 });
