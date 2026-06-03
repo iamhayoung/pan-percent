@@ -5,6 +5,8 @@ export const lightColors = {
   textSecondary: "#6B5E54",
   accent: "#C0612F",
   accentText: "#FFFFFF",
+  danger: "#E53935",
+  dangerText: "#FFFFFF",
   border: "#E7DECF",
 } as const;
 
@@ -15,6 +17,8 @@ export const darkColors = {
   textSecondary: "#B8A99B",
   accent: "#E08A52",
   accentText: "#1A1714",
+  danger: "#EF5350",
+  dangerText: "#FFFFFF",
   border: "#3A322B",
 } as const;
 

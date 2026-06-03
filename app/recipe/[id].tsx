@@ -1,5 +1,13 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { BakerPercentTable } from "@/components/recipe/BakerPercentTable";
 import { ScaleControl } from "@/components/recipe/ScaleControl";
 import { useT } from "@/lib/i18n/LanguageProvider";
@@ -49,13 +57,24 @@ export default function RecipeDetailScreen() {
       style={{ backgroundColor: theme.colors.background }}
       contentContainerStyle={styles.content}
     >
-      <Text style={[styles.title, { color: theme.colors.textPrimary }]}>
+      <Text
+        style={[
+          styles.title,
+          { color: theme.colors.textPrimary, fontSize: theme.fontSize.xxl },
+        ]}
+      >
         {recipe.name}
       </Text>
       {recipe.tags.length > 0 && (
         <View style={styles.tags}>
           {recipe.tags.map((tag) => (
-            <Text key={tag} style={{ color: theme.colors.textSecondary }}>
+            <Text
+              key={tag}
+              style={{
+                color: theme.colors.textSecondary,
+                fontSize: theme.fontSize.md,
+              }}
+            >
               {tag}
             </Text>
           ))}
@@ -63,19 +82,43 @@ export default function RecipeDetailScreen() {
       )}
       {recipe.memo ? (
         <View style={styles.section}>
-          <Text style={{ color: theme.colors.textSecondary }}>{t("memo")}</Text>
-          <Text style={{ color: theme.colors.textPrimary }}>{recipe.memo}</Text>
+          <Text
+            style={{
+              color: theme.colors.textSecondary,
+              fontSize: theme.fontSize.md,
+            }}
+          >
+            {t("memo")}
+          </Text>
+          <Text
+            style={{
+              color: theme.colors.textPrimary,
+              fontSize: theme.fontSize.lg,
+            }}
+          >
+            {recipe.memo}
+          </Text>
         </View>
       ) : null}
       <BakerPercentTable ingredients={recipe.ingredients} />
       <ScaleControl ingredients={recipe.ingredients} />
-      <Text
+      <Pressable
         accessibilityRole="button"
+        accessibilityLabel={t("delete")}
         onPress={confirmDelete}
-        style={[styles.delete, { color: theme.colors.accent }]}
+        style={[styles.delete, { borderColor: theme.colors.danger }]}
       >
-        {t("delete")}
-      </Text>
+        <Ionicons name="trash" size={18} color={theme.colors.danger} />
+        <Text
+          style={{
+            color: theme.colors.danger,
+            fontWeight: "600",
+            fontSize: theme.fontSize.md,
+          }}
+        >
+          {t("delete")}
+        </Text>
+      </Pressable>
     </ScrollView>
   );
 }
@@ -83,9 +126,21 @@ export default function RecipeDetailScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   center: { alignItems: "center", justifyContent: "center" },
-  content: { padding: 16, gap: 16 },
-  title: { fontSize: 24, fontWeight: "700" },
+  content: { padding: 16, gap: 20 },
+  title: { fontWeight: "700" },
   tags: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  section: { gap: 4 },
-  delete: { paddingVertical: 12, fontWeight: "600" },
+  section: { gap: 6 },
+  delete: {
+    alignSelf: "flex-start",
+    minHeight: 44,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderWidth: 1.5,
+    borderRadius: 12,
+    flexDirection: "row",
+    gap: 6,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 8,
+  },
 });

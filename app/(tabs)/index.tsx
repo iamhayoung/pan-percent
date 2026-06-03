@@ -46,10 +46,10 @@ export default function RecipesScreen() {
           onPress={() => deleteRecipe(item.id)}
           style={[
             styles.deleteAction,
-            { backgroundColor: theme.colors.accent },
+            { backgroundColor: theme.colors.danger },
           ]}
         >
-          <Ionicons name="close" size={24} color={theme.colors.accentText} />
+          <Ionicons name="trash" size={24} color={theme.colors.dangerText} />
         </Pressable>
       )}
     >

@@ -23,10 +23,20 @@ export function BakerPercentTable({
   return (
     <View style={{ gap: theme.spacing.xs }}>
       <View style={styles.row}>
-        <Text style={[styles.cellName, { color: theme.colors.textSecondary }]}>
+        <Text
+          style={[
+            styles.cellName,
+            { color: theme.colors.textSecondary, fontSize: theme.fontSize.md },
+          ]}
+        >
           {t("ingredients")}
         </Text>
-        <Text style={{ color: theme.colors.textSecondary }}>
+        <Text
+          style={{
+            color: theme.colors.textSecondary,
+            fontSize: theme.fontSize.md,
+          }}
+        >
           {t("bakerPercent")}
         </Text>
       </View>
@@ -35,14 +45,31 @@ export function BakerPercentTable({
           key={ingredient.id}
           style={[styles.row, { borderTopColor: theme.colors.border }]}
         >
-          <Text style={[styles.cellName, { color: theme.colors.textPrimary }]}>
+          <Text
+            style={[
+              styles.cellName,
+              { color: theme.colors.textPrimary, fontSize: theme.fontSize.lg },
+            ]}
+          >
             {ingredient.name}
           </Text>
-          <Text style={{ color: theme.colors.textSecondary }}>
+          <Text
+            style={{
+              color: theme.colors.textSecondary,
+              fontSize: theme.fontSize.md,
+            }}
+          >
             {ingredient.grams}g
           </Text>
           <Text
-            style={[styles.cellPercent, { color: theme.colors.textPrimary }]}
+            style={[
+              styles.cellPercent,
+              {
+                color: theme.colors.textPrimary,
+                fontSize: theme.fontSize.lg,
+                fontWeight: "600",
+              },
+            ]}
           >
             {formatPercent(percents[index].percent)}
           </Text>
@@ -58,8 +85,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     gap: 12,
-    paddingVertical: 6,
+    paddingVertical: 12,
   },
   cellName: { flex: 1 },
-  cellPercent: { minWidth: 56, textAlign: "right" },
+  cellPercent: { minWidth: 64, textAlign: "right" },
 });
