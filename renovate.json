@@ -14,58 +14,33 @@
   "automergeStrategy": "squash",
   "packageRules": [
     {
-      "description": "Disable React core packages - must follow Expo SDK compatibility",
+      "description": "Managed by the Expo SDK — update via `expo install --fix`, not Renovate (avoids native incompatibility with the pinned SDK)",
       "matchPackageNames": [
+        "expo",
         "react",
         "react-dom",
         "react-native",
-        "@types/react"
+        "react-test-renderer",
+        "jest",
+        "jest-expo",
+        "@types/react",
+        "/^@expo//",
+        "/^expo-/",
+        "/^react-native/",
+        "/^@react-native/",
+        "/^@react-navigation//"
       ],
       "enabled": false
     },
     {
-      "description": "Expo SDK - group all updates together",
-      "matchPackageNames": ["expo"],
-      "groupName": "Expo SDK",
-      "labels": ["expo-sdk"],
-      "prPriority": 10
-    },
-    {
-      "description": "Expo packages - group all updates together",
-      "matchPackageNames": ["/^@expo//", "/^expo-/"],
-      "excludePackageNames": ["expo"],
-      "groupName": "Expo packages",
-      "labels": ["expo-packages"],
-      "prPriority": 8
-    },
-    {
-      "description": "React Navigation - group all updates together",
-      "matchPackageNames": ["/^@react-navigation/"],
-      "groupName": "React Navigation",
-      "labels": ["react-navigation"],
-      "prPriority": 6
-    },
-    {
-      "description": "React Native ecosystem - group all updates together",
-      "matchPackageNames": ["/^react-native-/", "/^@react-native/"],
-      "groupName": "React Native ecosystem",
-      "labels": ["react-native-ecosystem"],
-      "prPriority": 5
-    },
-    {
-      "description": "Automerge non-breaking changes (patch and minor)",
-      "matchUpdateTypes": ["patch", "minor"],
-      "automerge": true
-    },
-    {
-      "description": "Major updates require manual review",
+      "description": "Major updates: hold for manual review via the Dependency Dashboard (no auto PR)",
       "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true,
       "automerge": false
     },
     {
-      "description": "Automerge devDependencies (except @types/react)",
-      "matchDepTypes": ["devDependencies"],
-      "matchPackageNames": ["!@types/react"],
+      "description": "Automerge non-breaking updates (patch and minor) once CI passes",
+      "matchUpdateTypes": ["patch", "minor"],
       "automerge": true
     }
   ]
