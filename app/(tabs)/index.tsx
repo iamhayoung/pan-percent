@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 24,
     borderRadius: 12,
-    marginVertical: 0,
+    marginLeft: 12,
   },
   fab: {
     position: "absolute",
