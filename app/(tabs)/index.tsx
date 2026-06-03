@@ -1,3 +1,4 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
@@ -41,13 +42,14 @@ export default function RecipesScreen() {
         <Pressable
           testID={`delete-recipe-${item.id}`}
           accessibilityRole="button"
+          accessibilityLabel={t("delete")}
           onPress={() => deleteRecipe(item.id)}
           style={[
             styles.deleteAction,
             { backgroundColor: theme.colors.accent },
           ]}
         >
-          <Text style={{ color: theme.colors.accentText }}>{t("delete")}</Text>
+          <Ionicons name="close" size={24} color={theme.colors.accentText} />
         </Pressable>
       )}
     >
