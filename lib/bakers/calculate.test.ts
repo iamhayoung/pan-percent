@@ -1,6 +1,7 @@
 import type { Ingredient } from "@/types/recipe";
 import {
   bakerPercents,
+  gramsFromPercent,
   scaleToFlour,
   totalFlour,
   totalWeight,
@@ -59,5 +60,17 @@ describe("scaleToFlour", () => {
     expect(scaleToFlour([ing("water", 350, false)], 1000)).toBeNull();
     expect(scaleToFlour([ing("flour", 500, true)], 0)).toBeNull();
     expect(scaleToFlour([ing("flour", 500, true)], Number.NaN)).toBeNull();
+  });
+});
+
+describe("gramsFromPercent", () => {
+  it("converts a percent of total flour to grams", () => {
+    expect(gramsFromPercent(70, 500)).toBe(350);
+    expect(gramsFromPercent(2, 500)).toBe(10);
+  });
+
+  it("returns null when flour is zero or the percent is invalid", () => {
+    expect(gramsFromPercent(70, 0)).toBeNull();
+    expect(gramsFromPercent(Number.NaN, 500)).toBeNull();
   });
 });

@@ -34,3 +34,13 @@ export function scaleToFlour(
     grams: ingredient.grams * factor,
   }));
 }
+
+export function gramsFromPercent(
+  percent: number,
+  totalFlour: number,
+): number | null {
+  if (!(totalFlour > 0) || !Number.isFinite(percent)) {
+    return null;
+  }
+  return (percent / 100) * totalFlour;
+}
