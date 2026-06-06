@@ -3,7 +3,9 @@ import type { Ingredient, Recipe } from "@/types/recipe";
 import { useRecipeForm } from "./useRecipeForm";
 
 let mockIdn = 0;
-jest.mock("expo-crypto", () => ({ randomUUID: jest.fn(() => `id-${++mockIdn}`) }));
+jest.mock("expo-crypto", () => ({
+  randomUUID: jest.fn(() => `id-${++mockIdn}`),
+}));
 
 const recipe = (ingredients: Ingredient[]): Recipe => ({
   id: "r1",
