@@ -22,6 +22,13 @@
 
 ## Keyboard / Forms
 
+- [ ] **タグ編集 UI で「+ Add tag」ボタンと入力欄の幅が OS で揃わない。**
+  - 症状: タップして TextInput に切り替えると、iOS では TextInput の方が少し長く、Android では少し短い。
+  - 環境: iOS / Android で挙動が逆方向。表示・操作上は問題なし。
+  - 試したこと: minWidth 調整、onLayout でボタンの実測 width を TextInput に渡す方法、親 Pressable で囲んで中身だけ切り替える構造 — どれも完全には揃わなかった。React Native の TextInput が OS ごとに intrinsic padding / measure を持つことが原因。
+  - 方針: 一旦現状維持。改善方向は、外側を完全に同一の View でラップしつつ TextInput の native intrinsic padding を相殺する実装か、外側に width を固定で持たせる方向。
+  - 発見: `feature/tag-chips` 実機確認時。
+
 - [ ] **iOS で leave-guard の Cancel 後に戻るボタンが反応しなくなる。**
   - 症状: 編集画面で変更あり → `<` → 「Save changes?」alert → Cancel → 編集画面に戻る → `<` をもう一度タップしても無反応。スワイプ back するとリスト方向に動くが、一瞬で alert が再表示される。
   - 環境: iOS のみ（Android では問題なし）。Save / Discard / Delete 経路は正常。
