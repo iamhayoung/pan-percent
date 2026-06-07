@@ -61,6 +61,16 @@ describe("scaleToFlour", () => {
     expect(scaleToFlour([ing("flour", 500, true)], 0)).toBeNull();
     expect(scaleToFlour([ing("flour", 500, true)], Number.NaN)).toBeNull();
   });
+
+  it("rounds the scaled grams to integers", () => {
+    const items = [ing("flour", 550, true), ing("water", 385, false)];
+    const scaled = scaleToFlour(items, 560);
+
+    expect(scaled).toEqual([
+      { id: "flour", name: "flour", grams: 560, isFlour: true },
+      { id: "water", name: "water", grams: 392, isFlour: false },
+    ]);
+  });
 });
 
 describe("gramsFromPercent", () => {

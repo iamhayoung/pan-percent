@@ -18,6 +18,7 @@ export function FlourPanel({
   onFlourGrams,
   onFlourName,
   onAddFlour,
+  onRemoveFlour,
 }: {
   flours: Ingredient[];
   totalFlour: number;
@@ -25,6 +26,7 @@ export function FlourPanel({
   onFlourGrams: (id: string, grams: number) => void;
   onFlourName: (id: string, name: string) => void;
   onAddFlour: () => void;
+  onRemoveFlour: (id: string) => void;
 }) {
   const theme = useTheme();
   const { t } = useT();
@@ -48,31 +50,72 @@ export function FlourPanel({
         <Pressable
           testID="flour-minus"
           accessibilityRole="button"
+          disabled={totalFlour <= 0}
           onPress={() => onScaleTotal(Math.max(0, totalFlour - STEP))}
-          style={[styles.stepBtn, { backgroundColor: theme.colors.accent }]}
+          style={[
+            styles.stepBtn,
+            {
+              backgroundColor:
+                totalFlour <= 0 ? theme.colors.border : theme.colors.accent,
+            },
+          ]}
         >
-          <Ionicons name="remove" size={24} color={theme.colors.accentText} />
+          <Ionicons
+            name="remove"
+            size={24}
+            color={
+              totalFlour <= 0
+                ? theme.colors.textSecondary
+                : theme.colors.accentText
+            }
+          />
         </Pressable>
-        <TextInput
-          testID="total-flour-input"
-          value={String(totalFlour)}
-          keyboardType="numeric"
-          onChangeText={(x) => onScaleTotal(toNumber(x))}
-          style={[styles.total, { color: theme.colors.textPrimary }]}
-        />
+        <View style={styles.totalWrap}>
+          <TextInput
+            testID="total-flour-input"
+            textAlign="right"
+            selectTextOnFocus
+            value={totalFlour > 0 ? String(totalFlour) : ""}
+            keyboardType="numeric"
+            onChangeText={(x) => onScaleTotal(toNumber(x))}
+            placeholder="0"
+            placeholderTextColor={theme.colors.textSecondary}
+            style={[styles.total, { color: theme.colors.textPrimary }]}
+          />
+          <Text
+            style={[styles.totalUnit, { color: theme.colors.textSecondary }]}
+          >
+            g
+          </Text>
+        </View>
         <Pressable
           testID="flour-plus"
           accessibilityRole="button"
+          disabled={totalFlour <= 0}
           onPress={() => onScaleTotal(totalFlour + STEP)}
-          style={[styles.stepBtn, { backgroundColor: theme.colors.accent }]}
+          style={[
+            styles.stepBtn,
+            {
+              backgroundColor:
+                totalFlour <= 0 ? theme.colors.border : theme.colors.accent,
+            },
+          ]}
         >
-          <Ionicons name="add" size={24} color={theme.colors.accentText} />
+          <Ionicons
+            name="add"
+            size={24}
+            color={
+              totalFlour <= 0
+                ? theme.colors.textSecondary
+                : theme.colors.accentText
+            }
+          />
         </Pressable>
       </View>
 
       <View style={[styles.divider, { borderTopColor: theme.colors.border }]} />
 
-      {flours.map((f) => (
+      {flours.map((f, index) => (
         <View key={f.id} style={styles.flourRow}>
           <TextInput
             testID={`flour-name-${f.id}`}
@@ -83,13 +126,43 @@ export function FlourPanel({
             style={[styles.flourName, { color: theme.colors.textPrimary }]}
           />
           {blended && (
-            <TextInput
-              testID={`flour-grams-${f.id}`}
-              value={String(f.grams)}
-              keyboardType="numeric"
-              onChangeText={(x) => onFlourGrams(f.id, toNumber(x))}
-              style={[styles.flourGrams, { color: theme.colors.textPrimary }]}
-            />
+            <>
+              <TextInput
+                testID={`flour-grams-${f.id}`}
+                textAlign="right"
+                selectTextOnFocus
+                value={f.grams > 0 ? String(f.grams) : ""}
+                keyboardType="numeric"
+                onChangeText={(x) => onFlourGrams(f.id, toNumber(x))}
+                placeholder="0"
+                placeholderTextColor={theme.colors.textSecondary}
+                style={[styles.flourGrams, { color: theme.colors.textPrimary }]}
+              />
+              <Text
+                style={[
+                  styles.flourUnit,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                g
+              </Text>
+            </>
+          )}
+          {blended && (
+            <Pressable
+              testID={`remove-flour-${f.id}`}
+              accessibilityRole="button"
+              accessibilityLabel={t("delete")}
+              disabled={index === 0}
+              onPress={() => onRemoveFlour(f.id)}
+              style={styles.removeFlour}
+            >
+              <Ionicons
+                name="close"
+                size={20}
+                color={index === 0 ? theme.colors.border : theme.colors.danger}
+              />
+            </Pressable>
           )}
         </View>
       ))}
@@ -121,16 +194,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  total: { flex: 1, fontSize: 26, fontWeight: "700", textAlign: "center" },
+  totalWrap: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "baseline",
+    justifyContent: "center",
+    gap: 6,
+  },
+  total: { minWidth: 60, fontSize: 26, fontWeight: "700" },
+  totalUnit: { fontSize: 16 },
   divider: { borderTopWidth: 1 },
   flourRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   flourName: { flex: 1, fontSize: 16, paddingVertical: 8 },
   flourGrams: {
-    width: 72,
+    width: 60,
     fontSize: 16,
-    textAlign: "right",
     paddingVertical: 8,
   },
+  flourUnit: { fontSize: 14 },
+  removeFlour: { padding: 6 },
   addFlour: {
     borderWidth: 1.5,
     borderStyle: "dashed",

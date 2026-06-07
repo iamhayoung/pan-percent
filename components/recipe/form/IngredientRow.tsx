@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Pressable, StyleSheet, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useT } from "@/lib/i18n/LanguageProvider";
 import { useTheme } from "@/lib/theme/useTheme";
 import type { Ingredient } from "@/types/recipe";
@@ -19,6 +19,8 @@ function formatPercent(percent: number | null): string {
 export function IngredientRow({
   ingredient,
   percent,
+  percentEditable,
+  removable,
   onName,
   onGrams,
   onPercent,
@@ -26,6 +28,8 @@ export function IngredientRow({
 }: {
   ingredient: Ingredient;
   percent: number | null;
+  percentEditable: boolean;
+  removable: boolean;
   onName: (name: string) => void;
   onGrams: (grams: number) => void;
   onPercent: (percent: number) => void;
@@ -34,6 +38,9 @@ export function IngredientRow({
   const theme = useTheme();
   const { t } = useT();
   const id = ingredient.id;
+  const percentColor = percentEditable
+    ? theme.colors.textPrimary
+    : theme.colors.textSecondary;
 
   return (
     <View style={[styles.row, { borderTopColor: theme.colors.border }]}>
@@ -45,28 +52,52 @@ export function IngredientRow({
         placeholderTextColor={theme.colors.textSecondary}
         style={[styles.name, { color: theme.colors.textPrimary }]}
       />
-      <TextInput
-        testID={`ingredient-grams-${id}`}
-        value={String(ingredient.grams)}
-        keyboardType="numeric"
-        onChangeText={(x) => onGrams(toNumber(x))}
-        style={[styles.num, { color: theme.colors.textPrimary }]}
-      />
-      <TextInput
-        testID={`ingredient-percent-${id}`}
-        value={formatPercent(percent)}
-        keyboardType="numeric"
-        onChangeText={(x) => onPercent(toNumber(x))}
-        style={[styles.num, { color: theme.colors.textSecondary }]}
-      />
+      <View style={styles.numWrap}>
+        <TextInput
+          testID={`ingredient-grams-${id}`}
+          textAlign="right"
+          selectTextOnFocus
+          value={ingredient.grams > 0 ? String(ingredient.grams) : ""}
+          keyboardType="numeric"
+          onChangeText={(x) => onGrams(toNumber(x))}
+          placeholder="0"
+          placeholderTextColor={theme.colors.textSecondary}
+          style={[styles.num, { color: theme.colors.textPrimary }]}
+        />
+        <Text style={[styles.unit, { color: theme.colors.textSecondary }]}>
+          g
+        </Text>
+      </View>
+      <View style={styles.numWrap}>
+        <TextInput
+          testID={`ingredient-percent-${id}`}
+          textAlign="right"
+          selectTextOnFocus
+          editable={percentEditable}
+          value={formatPercent(percent)}
+          keyboardType="numeric"
+          onChangeText={(x) => onPercent(toNumber(x))}
+          placeholder={percentEditable ? "0" : "—"}
+          placeholderTextColor={theme.colors.textSecondary}
+          style={[styles.num, { color: percentColor }]}
+        />
+        <Text style={[styles.unit, { color: theme.colors.textSecondary }]}>
+          %
+        </Text>
+      </View>
       <Pressable
         testID={`remove-ingredient-${id}`}
         accessibilityRole="button"
         accessibilityLabel={t("delete")}
+        disabled={!removable}
         onPress={onRemove}
         style={styles.remove}
       >
-        <Ionicons name="close" size={20} color={theme.colors.danger} />
+        <Ionicons
+          name="close"
+          size={20}
+          color={removable ? theme.colors.danger : theme.colors.border}
+        />
       </Pressable>
     </View>
   );
@@ -81,6 +112,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
   },
   name: { flex: 1, fontSize: 16, paddingVertical: 8 },
-  num: { width: 64, fontSize: 16, textAlign: "right", paddingVertical: 8 },
+  numWrap: { flexDirection: "row", alignItems: "baseline", gap: 3 },
+  num: { width: 48, fontSize: 16, paddingVertical: 8 },
+  unit: { fontSize: 14 },
   remove: { padding: 6 },
 });

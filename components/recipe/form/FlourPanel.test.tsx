@@ -22,6 +22,7 @@ const baseProps = {
   onFlourGrams: noop,
   onFlourName: noop,
   onAddFlour: noop,
+  onRemoveFlour: noop,
 };
 
 describe("FlourPanel", () => {
@@ -75,5 +76,47 @@ describe("FlourPanel", () => {
     expect(screen.getByTestId("flour-name-f1")).toBeTruthy();
     expect(screen.getByTestId("flour-name-f2")).toBeTruthy();
     expect(screen.getByTestId("flour-grams-f2")).toBeTruthy();
+  });
+
+  it("hides the remove button when there is only one flour", () => {
+    renderWithProvider(
+      <FlourPanel
+        {...baseProps}
+        flours={[flour("f1", "強力粉", 250)]}
+        totalFlour={250}
+      />,
+    );
+
+    expect(screen.queryByTestId("remove-flour-f1")).toBeNull();
+  });
+
+  it("disables the remove button on the first flour even when blended", () => {
+    renderWithProvider(
+      <FlourPanel
+        {...baseProps}
+        flours={[flour("f1", "全粒粉", 100), flour("f2", "強力粉", 150)]}
+        totalFlour={250}
+      />,
+    );
+
+    const first = screen.getByTestId("remove-flour-f1");
+    expect(first.props.accessibilityState?.disabled).toBe(true);
+    const second = screen.getByTestId("remove-flour-f2");
+    expect(second.props.accessibilityState?.disabled).toBe(false);
+  });
+
+  it("calls onRemoveFlour with the flour id when blended", () => {
+    const onRemoveFlour = jest.fn();
+    renderWithProvider(
+      <FlourPanel
+        {...baseProps}
+        flours={[flour("f1", "全粒粉", 100), flour("f2", "強力粉", 150)]}
+        totalFlour={250}
+        onRemoveFlour={onRemoveFlour}
+      />,
+    );
+
+    fireEvent.press(screen.getByTestId("remove-flour-f2"));
+    expect(onRemoveFlour).toHaveBeenCalledWith("f2");
   });
 });

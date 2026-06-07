@@ -21,6 +21,15 @@ beforeEach(() => {
 });
 
 describe("useRecipeForm", () => {
+  it("starts a new draft with one flour and one ingredient row", () => {
+    const { result } = renderHook(() => useRecipeForm(null));
+
+    const flours = result.current.draft.ingredients.filter((i) => i.isFlour);
+    const others = result.current.draft.ingredients.filter((i) => !i.isFlour);
+    expect(flours).toHaveLength(1);
+    expect(others).toHaveLength(1);
+  });
+
   it("starts not dirty and becomes dirty on edit", () => {
     const { result } = renderHook(() => useRecipeForm(null));
 
@@ -85,5 +94,108 @@ describe("useRecipeForm", () => {
     expect(
       result.current.draft.ingredients.find((i) => i.id === "water")?.grams,
     ).toBe(100);
+  });
+
+  it("assigns the target grams to the first flour when the current total is zero", () => {
+    const { result } = renderHook(() => useRecipeForm(null));
+    const flourId = result.current.draft.ingredients[0].id;
+
+    act(() => result.current.scaleTotalFlour(250));
+
+    expect(
+      result.current.draft.ingredients.find((i) => i.id === flourId)?.grams,
+    ).toBe(250);
+    expect(result.current.totalFlour).toBe(250);
+  });
+
+  it("clears all flour grams when the scale target is zero, leaving other ingredients", () => {
+    const initial = recipe([
+      { id: "flour-a", name: "強力粉", grams: 300, isFlour: true },
+      { id: "flour-b", name: "全粒粉", grams: 200, isFlour: true },
+      { id: "water", name: "水", grams: 350, isFlour: false },
+    ]);
+    const { result } = renderHook(() => useRecipeForm(initial));
+
+    act(() => result.current.scaleTotalFlour(0));
+
+    expect(result.current.totalFlour).toBe(0);
+    const ings = result.current.draft.ingredients;
+    expect(ings.find((i) => i.id === "flour-a")?.grams).toBe(0);
+    expect(ings.find((i) => i.id === "flour-b")?.grams).toBe(0);
+    expect(ings.find((i) => i.id === "water")?.grams).toBe(350);
+  });
+
+  it("ignores negative scale targets", () => {
+    const initial = recipe([
+      { id: "flour", name: "強力粉", grams: 500, isFlour: true },
+      { id: "water", name: "水", grams: 350, isFlour: false },
+    ]);
+    const { result } = renderHook(() => useRecipeForm(initial));
+
+    act(() => result.current.scaleTotalFlour(-100));
+    expect(result.current.totalFlour).toBe(500);
+  });
+});
+
+describe("useRecipeForm.isValid", () => {
+  it("is invalid when the name is empty", () => {
+    const initial = recipe([
+      { id: "flour", name: "強力粉", grams: 500, isFlour: true },
+      { id: "water", name: "水", grams: 350, isFlour: false },
+    ]);
+    const { result } = renderHook(() => useRecipeForm(initial));
+
+    act(() => result.current.setName(""));
+
+    expect(result.current.isValid).toBe(false);
+  });
+
+  it("is invalid when a flour row has an empty name or zero grams", () => {
+    const initial = recipe([
+      { id: "flour", name: "", grams: 500, isFlour: true },
+      { id: "water", name: "水", grams: 350, isFlour: false },
+    ]);
+    const { result } = renderHook(() => useRecipeForm(initial));
+    expect(result.current.isValid).toBe(false);
+
+    const zeroFlour = recipe([
+      { id: "flour", name: "強力粉", grams: 0, isFlour: true },
+      { id: "water", name: "水", grams: 350, isFlour: false },
+    ]);
+    const { result: r2 } = renderHook(() => useRecipeForm(zeroFlour));
+    expect(r2.current.isValid).toBe(false);
+  });
+
+  it("is invalid when there are no non-flour ingredients", () => {
+    const initial = recipe([
+      { id: "flour", name: "強力粉", grams: 500, isFlour: true },
+    ]);
+    const { result } = renderHook(() => useRecipeForm(initial));
+    expect(result.current.isValid).toBe(false);
+  });
+
+  it("is invalid when an ingredient row has an empty name or zero grams", () => {
+    const initial = recipe([
+      { id: "flour", name: "強力粉", grams: 500, isFlour: true },
+      { id: "water", name: "", grams: 350, isFlour: false },
+    ]);
+    const { result } = renderHook(() => useRecipeForm(initial));
+    expect(result.current.isValid).toBe(false);
+
+    const zeroOther = recipe([
+      { id: "flour", name: "強力粉", grams: 500, isFlour: true },
+      { id: "water", name: "水", grams: 0, isFlour: false },
+    ]);
+    const { result: r2 } = renderHook(() => useRecipeForm(zeroOther));
+    expect(r2.current.isValid).toBe(false);
+  });
+
+  it("is valid when name, all flours, and at least one ingredient are filled", () => {
+    const initial = recipe([
+      { id: "flour", name: "強力粉", grams: 500, isFlour: true },
+      { id: "water", name: "水", grams: 350, isFlour: false },
+    ]);
+    const { result } = renderHook(() => useRecipeForm(initial));
+    expect(result.current.isValid).toBe(true);
   });
 });

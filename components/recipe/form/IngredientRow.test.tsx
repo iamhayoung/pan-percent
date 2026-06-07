@@ -24,6 +24,8 @@ describe("IngredientRow", () => {
       <IngredientRow
         ingredient={water}
         percent={70}
+        percentEditable={true}
+        removable={true}
         onName={onName}
         onGrams={noop}
         onPercent={noop}
@@ -42,6 +44,8 @@ describe("IngredientRow", () => {
       <IngredientRow
         ingredient={water}
         percent={70}
+        percentEditable={true}
+        removable={true}
         onName={noop}
         onGrams={onGrams}
         onPercent={noop}
@@ -59,6 +63,8 @@ describe("IngredientRow", () => {
       <IngredientRow
         ingredient={water}
         percent={70}
+        percentEditable={true}
+        removable={true}
         onName={noop}
         onGrams={noop}
         onPercent={onPercent}
@@ -70,12 +76,50 @@ describe("IngredientRow", () => {
     expect(onPercent).toHaveBeenCalledWith(65);
   });
 
+  it("disables the percent input when percentEditable is false", () => {
+    renderWithProvider(
+      <IngredientRow
+        ingredient={water}
+        percent={null}
+        percentEditable={false}
+        removable={true}
+        onName={noop}
+        onGrams={noop}
+        onPercent={noop}
+        onRemove={noop}
+      />,
+    );
+
+    const input = screen.getByTestId("ingredient-percent-water");
+    expect(input.props.editable).toBe(false);
+  });
+
+  it("disables the remove button when removable is false", () => {
+    renderWithProvider(
+      <IngredientRow
+        ingredient={water}
+        percent={70}
+        percentEditable={true}
+        removable={false}
+        onName={noop}
+        onGrams={noop}
+        onPercent={noop}
+        onRemove={noop}
+      />,
+    );
+
+    const btn = screen.getByTestId("remove-ingredient-water");
+    expect(btn.props.accessibilityState?.disabled).toBe(true);
+  });
+
   it("calls onRemove when the remove button is pressed", () => {
     const onRemove = jest.fn();
     renderWithProvider(
       <IngredientRow
         ingredient={water}
         percent={70}
+        percentEditable={true}
+        removable={true}
         onName={noop}
         onGrams={noop}
         onPercent={noop}

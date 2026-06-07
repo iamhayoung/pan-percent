@@ -31,7 +31,7 @@ export function scaleToFlour(
   const factor = targetFlour / flour;
   return ingredients.map((ingredient) => ({
     ...ingredient,
-    grams: ingredient.grams * factor,
+    grams: Math.round(ingredient.grams * factor),
   }));
 }
 

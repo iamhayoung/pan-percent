@@ -12,6 +12,7 @@ type Bake = { temperatureC?: number; minutes?: number };
 export type RecipeFormApi = {
   draft: RecipeDraft;
   dirty: boolean;
+  isValid: boolean;
   totalFlour: number;
   setName: (name: string) => void;
   setIngredientName: (id: string, name: string) => void;
@@ -26,13 +27,27 @@ export type RecipeFormApi = {
   setMemo: (memo: string) => void;
 };
 
+function isValidDraft(d: RecipeDraft): boolean {
+  if (d.name.trim() === "") return false;
+  const flours = d.ingredients.filter((i) => i.isFlour);
+  const others = d.ingredients.filter((i) => !i.isFlour);
+  if (flours.length === 0 || others.length === 0) return false;
+  if (!flours.every((f) => f.name.trim() !== "" && f.grams > 0)) return false;
+  if (!others.every((o) => o.name.trim() !== "" && o.grams > 0)) return false;
+  return true;
+}
+
 function newIngredient(isFlour: boolean): Ingredient {
   return { id: randomUUID(), name: "", grams: 0, isFlour };
 }
 
 function toDraft(initial: Recipe | null): RecipeDraft {
   if (initial === null) {
-    return { name: "", ingredients: [newIngredient(true)], tags: [] };
+    return {
+      name: "",
+      ingredients: [newIngredient(true), newIngredient(false)],
+      tags: [],
+    };
   }
   return {
     id: initial.id,
@@ -62,6 +77,7 @@ export function useRecipeForm(initial: Recipe | null): RecipeFormApi {
   return {
     draft,
     dirty,
+    isValid: isValidDraft(draft),
     totalFlour: total,
     setName: (name) => setDraft((d) => ({ ...d, name })),
     setIngredientName: (id, name) => patchIngredient(id, { name }),
@@ -88,10 +104,35 @@ export function useRecipeForm(initial: Recipe | null): RecipeFormApi {
         ingredients: d.ingredients.filter((i) => i.id !== id),
       })),
     scaleTotalFlour: (targetGrams) => {
-      const scaled = scaleToFlour(draft.ingredients, targetGrams);
-      if (scaled) {
-        setDraft((d) => ({ ...d, ingredients: scaled }));
-      }
+      if (!Number.isFinite(targetGrams) || targetGrams < 0) return;
+      setDraft((d) => {
+        if (targetGrams === 0) {
+          return {
+            ...d,
+            ingredients: d.ingredients.map((i) =>
+              i.isFlour ? { ...i, grams: 0 } : i,
+            ),
+          };
+        }
+        const currentTotal = d.ingredients
+          .filter((i) => i.isFlour)
+          .reduce((sum, i) => sum + i.grams, 0);
+        if (currentTotal > 0) {
+          const scaled = scaleToFlour(d.ingredients, targetGrams);
+          return scaled ? { ...d, ingredients: scaled } : d;
+        }
+        let assigned = false;
+        return {
+          ...d,
+          ingredients: d.ingredients.map((i) => {
+            if (i.isFlour && !assigned) {
+              assigned = true;
+              return { ...i, grams: targetGrams };
+            }
+            return i;
+          }),
+        };
+      });
     },
     setTags: (tags) => setDraft((d) => ({ ...d, tags })),
     setBake: (bake) => setDraft((d) => ({ ...d, bake })),
