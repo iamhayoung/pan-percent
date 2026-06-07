@@ -35,4 +35,30 @@ describe("RecipeCard", () => {
 
     expect(onPress).toHaveBeenCalledTimes(1);
   });
+
+  it("shows a one-line preview with flour and top ingredients when available", () => {
+    const withIngredients: Recipe = {
+      ...recipe,
+      ingredients: [
+        { id: "flour", name: "Bread flour", grams: 500, isFlour: true },
+        { id: "water", name: "Water", grams: 350, isFlour: false },
+        { id: "salt", name: "Salt", grams: 10, isFlour: false },
+      ],
+    };
+
+    renderWithProvider(
+      <RecipeCard recipe={withIngredients} onPress={() => {}} />,
+    );
+
+    expect(screen.getByTestId("recipe-preview-r1")).toBeTruthy();
+    expect(
+      screen.getByText("Bread flour 500g · Water 350g · Salt 10g"),
+    ).toBeTruthy();
+  });
+
+  it("hides the preview line when there is nothing to summarize", () => {
+    renderWithProvider(<RecipeCard recipe={recipe} onPress={() => {}} />);
+
+    expect(screen.queryByTestId("recipe-preview-r1")).toBeNull();
+  });
 });
