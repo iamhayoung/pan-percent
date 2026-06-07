@@ -36,8 +36,11 @@ export function RecipeForm({ initial }: { initial: Recipe | null }) {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const savedRef = useRef(false);
+  const savingRef = useRef(false);
 
   const persist = async () => {
+    if (savingRef.current) return;
+    savingRef.current = true;
     await save(form.draft);
     savedRef.current = true;
   };
@@ -78,6 +81,8 @@ export function RecipeForm({ initial }: { initial: Recipe | null }) {
         text: t("delete"),
         style: "destructive",
         onPress: async () => {
+          if (savingRef.current) return;
+          savingRef.current = true;
           await remove(initial.id);
           savedRef.current = true;
           router.back();
