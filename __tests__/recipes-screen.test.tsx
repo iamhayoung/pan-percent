@@ -10,7 +10,8 @@ import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
 import { save } from "@/lib/recipes/recipeRepository";
 import type { RecipeDraft } from "@/types/recipe";
 
-jest.mock("expo-router", () => ({ useRouter: () => ({ push: jest.fn() }) }));
+const mockPush = jest.fn();
+jest.mock("expo-router", () => ({ useRouter: () => ({ push: mockPush }) }));
 jest.mock("@react-navigation/native", () => {
   const react = require("react");
   return {
@@ -19,6 +20,9 @@ jest.mock("@react-navigation/native", () => {
 });
 jest.mock("expo-localization", () => ({
   getLocales: () => [{ languageCode: "en" }],
+}));
+jest.mock("react-native-safe-area-context", () => ({
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 jest.mock("expo-crypto", () => ({ randomUUID: jest.fn(() => "uuid-x") }));
 
@@ -33,6 +37,7 @@ const renderWithProvider = (ui: React.ReactElement) =>
 
 beforeEach(async () => {
   await AsyncStorage.clear();
+  mockPush.mockClear();
 });
 
 describe("RecipesScreen", () => {
@@ -52,7 +57,7 @@ describe("RecipesScreen", () => {
     await waitFor(() => expect(screen.getByText("Baguette")).toBeTruthy());
   });
 
-  it("adds a sample recipe when the FAB is pressed", async () => {
+  it("navigates to the new recipe screen when the FAB is pressed", async () => {
     renderWithProvider(<RecipesScreen />);
     await waitFor(() =>
       expect(screen.getByText("No recipes yet")).toBeTruthy(),
@@ -60,9 +65,7 @@ describe("RecipesScreen", () => {
 
     fireEvent.press(screen.getByTestId("add-recipe-fab"));
 
-    await waitFor(() =>
-      expect(screen.getByTestId("recipe-card-uuid-x")).toBeTruthy(),
-    );
+    expect(mockPush).toHaveBeenCalledWith("/recipe/new");
   });
 
   it("deletes a recipe from the swipe action", async () => {

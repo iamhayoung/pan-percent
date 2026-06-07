@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
+import { ScreenHeader } from "@/components/layout/ScreenHeader";
 import { useT } from "@/lib/i18n/LanguageProvider";
 import { useTheme } from "@/lib/theme/useTheme";
 
@@ -10,13 +11,17 @@ export default function SettingsScreen() {
     <View
       style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
-      <Text style={{ color: theme.colors.textPrimary }}>
-        {t("tabSettings")}
-      </Text>
+      <ScreenHeader title={t("tabSettings")} />
+      <View style={styles.body}>
+        <Text style={{ color: theme.colors.textSecondary }}>
+          {t("tabSettings")}
+        </Text>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: "center", justifyContent: "center" },
+  container: { flex: 1 },
+  body: { flex: 1, alignItems: "center", justifyContent: "center" },
 });

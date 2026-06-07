@@ -2,34 +2,19 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
+import { ScreenHeader } from "@/components/layout/ScreenHeader";
 import { RecipeCard } from "@/components/recipe/RecipeCard";
 import { useT } from "@/lib/i18n/LanguageProvider";
-import { remove, save } from "@/lib/recipes/recipeRepository";
+import { remove } from "@/lib/recipes/recipeRepository";
 import { useRecipes } from "@/lib/recipes/useRecipes";
 import { useTheme } from "@/lib/theme/useTheme";
-import type { Recipe, RecipeDraft } from "@/types/recipe";
-
-// HACK: temporary dev seed. Replace with router.push("/recipe/new") in feature/recipe-form.
-const SAMPLE: RecipeDraft = {
-  name: "Sample bread",
-  ingredients: [
-    { id: "flour", name: "Bread flour", grams: 500, isFlour: true },
-    { id: "water", name: "Water", grams: 350, isFlour: false },
-    { id: "salt", name: "Salt", grams: 10, isFlour: false },
-  ],
-  tags: ["sample"],
-};
+import type { Recipe } from "@/types/recipe";
 
 export default function RecipesScreen() {
   const { t } = useT();
   const theme = useTheme();
   const router = useRouter();
   const { recipes, reload } = useRecipes();
-
-  const addSample = async () => {
-    await save(SAMPLE);
-    await reload();
-  };
 
   const deleteRecipe = async (id: string) => {
     await remove(id);
@@ -66,6 +51,7 @@ export default function RecipesScreen() {
     <View
       style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
+      <ScreenHeader title={t("tabRecipes")} />
       {recipes.length === 0 ? (
         <View style={styles.empty}>
           <Text style={{ color: theme.colors.textSecondary }}>
@@ -82,9 +68,9 @@ export default function RecipesScreen() {
       )}
       <Pressable
         testID="add-recipe-fab"
-        accessibilityLabel={t("addSampleRecipe")}
+        accessibilityLabel={t("newRecipe")}
         accessibilityRole="button"
-        onPress={addSample}
+        onPress={() => router.push("/recipe/new")}
         style={[styles.fab, { backgroundColor: theme.colors.accent }]}
       >
         <Text style={[styles.fabPlus, { color: theme.colors.accentText }]}>

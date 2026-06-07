@@ -18,4 +18,10 @@ describe("translate", () => {
     expect(translate("ko", "delete")).toBe("삭제");
     expect(translate("en", "targetFlourGrams")).toBe("Target flour (g)");
   });
+
+  it("has the recipe form keys in every language", () => {
+    expect(translate("ja", "targetAmount")).toBe("作りたい量");
+    expect(translate("ko", "save")).toBe("저장");
+    expect(translate("en", "addFlour")).toBe("Add flour");
+  });
 });

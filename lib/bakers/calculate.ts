@@ -31,6 +31,16 @@ export function scaleToFlour(
   const factor = targetFlour / flour;
   return ingredients.map((ingredient) => ({
     ...ingredient,
-    grams: ingredient.grams * factor,
+    grams: Math.round(ingredient.grams * factor * 10) / 10,
   }));
+}
+
+export function gramsFromPercent(
+  percent: number,
+  totalFlour: number,
+): number | null {
+  if (!(totalFlour > 0) || !Number.isFinite(percent)) {
+    return null;
+  }
+  return (percent / 100) * totalFlour;
 }

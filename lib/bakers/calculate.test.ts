@@ -1,6 +1,7 @@
 import type { Ingredient } from "@/types/recipe";
 import {
   bakerPercents,
+  gramsFromPercent,
   scaleToFlour,
   totalFlour,
   totalWeight,
@@ -59,5 +60,37 @@ describe("scaleToFlour", () => {
     expect(scaleToFlour([ing("water", 350, false)], 1000)).toBeNull();
     expect(scaleToFlour([ing("flour", 500, true)], 0)).toBeNull();
     expect(scaleToFlour([ing("flour", 500, true)], Number.NaN)).toBeNull();
+  });
+
+  it("rounds the scaled grams to one decimal place", () => {
+    const items = [ing("flour", 550, true), ing("water", 385, false)];
+    const scaled = scaleToFlour(items, 560);
+
+    expect(scaled).toEqual([
+      { id: "flour", name: "flour", grams: 560, isFlour: true },
+      { id: "water", name: "water", grams: 392, isFlour: false },
+    ]);
+  });
+
+  it("preserves a 0.1 g step when scaling", () => {
+    const items = [ing("flour", 100, true), ing("salt", 1.5, false)];
+    const scaled = scaleToFlour(items, 250);
+
+    expect(scaled).toEqual([
+      { id: "flour", name: "flour", grams: 250, isFlour: true },
+      { id: "salt", name: "salt", grams: 3.8, isFlour: false },
+    ]);
+  });
+});
+
+describe("gramsFromPercent", () => {
+  it("converts a percent of total flour to grams", () => {
+    expect(gramsFromPercent(70, 500)).toBe(350);
+    expect(gramsFromPercent(2, 500)).toBe(10);
+  });
+
+  it("returns null when flour is zero or the percent is invalid", () => {
+    expect(gramsFromPercent(70, 0)).toBeNull();
+    expect(gramsFromPercent(Number.NaN, 500)).toBeNull();
   });
 });
