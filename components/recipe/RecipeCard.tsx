@@ -1,6 +1,7 @@
 import { Image } from "expo-image";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Chip } from "@/components/ui/Chip";
+import { buildListPreview } from "@/lib/recipes/listPreview";
 import { useTheme } from "@/lib/theme/useTheme";
 import type { Recipe } from "@/types/recipe";
 
@@ -12,6 +13,7 @@ export function RecipeCard({
   onPress: () => void;
 }) {
   const theme = useTheme();
+  const preview = buildListPreview(recipe);
 
   return (
     <Pressable
@@ -37,6 +39,16 @@ export function RecipeCard({
         <Text style={[styles.name, { color: theme.colors.textPrimary }]}>
           {recipe.name}
         </Text>
+        {preview !== "" && (
+          <Text
+            testID={`recipe-preview-${recipe.id}`}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            style={[styles.preview, { color: theme.colors.textSecondary }]}
+          >
+            {preview}
+          </Text>
+        )}
         {recipe.tags.length > 0 && (
           <View style={styles.tags}>
             {recipe.tags.map((tag) => (
@@ -61,5 +73,6 @@ const styles = StyleSheet.create({
   thumb: { width: 56, height: 56, borderRadius: 12 },
   body: { flex: 1, gap: 6 },
   name: { fontSize: 18, fontWeight: "600" },
+  preview: { fontSize: 13 },
   tags: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
 });
