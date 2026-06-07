@@ -1,5 +1,6 @@
 import { Image } from "expo-image";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Chip } from "@/components/ui/Chip";
 import { useTheme } from "@/lib/theme/useTheme";
 import type { Recipe } from "@/types/recipe";
 
@@ -39,9 +40,7 @@ export function RecipeCard({
         {recipe.tags.length > 0 && (
           <View style={styles.tags}>
             {recipe.tags.map((tag) => (
-              <Text key={tag} style={{ color: theme.colors.textSecondary }}>
-                {tag}
-              </Text>
+              <Chip key={tag} label={tag} size="small" />
             ))}
           </View>
         )}
@@ -60,7 +59,7 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   thumb: { width: 56, height: 56, borderRadius: 12 },
-  body: { flex: 1, gap: 4 },
+  body: { flex: 1, gap: 6 },
   name: { fontSize: 18, fontWeight: "600" },
   tags: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
 });

@@ -1,3 +1,4 @@
+import { useHeaderHeight } from "@react-navigation/elements";
 import { usePreventRemove } from "@react-navigation/native";
 import { useNavigation, useRouter } from "expo-router";
 import { useRef } from "react";
@@ -16,7 +17,9 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FlourPanel } from "@/components/recipe/form/FlourPanel";
 import { IngredientRow } from "@/components/recipe/form/IngredientRow";
+import { TagChips } from "@/components/recipe/form/TagChips";
 import { bakerPercents } from "@/lib/bakers/calculate";
+import { formatDateTime } from "@/lib/i18n/formatDate";
 import { useT } from "@/lib/i18n/LanguageProvider";
 import { remove, save } from "@/lib/recipes/recipeRepository";
 import { useRecipeForm } from "@/lib/recipes/useRecipeForm";
@@ -30,11 +33,12 @@ function toNumber(text: string): number {
 
 export function RecipeForm({ initial }: { initial: Recipe | null }) {
   const form = useRecipeForm(initial);
-  const { t } = useT();
+  const { t, language } = useT();
   const theme = useTheme();
   const router = useRouter();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const headerHeight = useHeaderHeight();
   const savedRef = useRef(false);
   const savingRef = useRef(false);
 
@@ -106,7 +110,7 @@ export function RecipeForm({ initial }: { initial: Recipe | null }) {
     <KeyboardAvoidingView
       style={[styles.root, { backgroundColor: theme.colors.background }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 56 : 0}
+      keyboardVerticalOffset={Platform.OS === "ios" ? headerHeight : 0}
     >
       <ScrollView
         style={{ backgroundColor: theme.colors.background }}
@@ -125,6 +129,17 @@ export function RecipeForm({ initial }: { initial: Recipe | null }) {
           placeholderTextColor={theme.colors.textSecondary}
           style={[styles.nameInput, { color: theme.colors.textPrimary }]}
         />
+        {initial && (
+          <Text
+            testID="recipe-timestamp"
+            style={[styles.timestamp, { color: theme.colors.textSecondary }]}
+          >
+            {t("lastUpdated").replace(
+              "{date}",
+              formatDateTime(initial.updatedAt, language),
+            )}
+          </Text>
+        )}
 
         <FlourPanel
           flours={flours}
@@ -173,27 +188,7 @@ export function RecipeForm({ initial }: { initial: Recipe | null }) {
           </Pressable>
         </View>
 
-        <TextInput
-          testID="tags-input"
-          value={form.draft.tags.join(", ")}
-          onChangeText={(x) =>
-            form.setTags(
-              x
-                .split(",")
-                .map((s) => s.trim())
-                .filter(Boolean),
-            )
-          }
-          placeholder={t("tags")}
-          placeholderTextColor={theme.colors.textSecondary}
-          style={[
-            styles.field,
-            {
-              color: theme.colors.textPrimary,
-              borderColor: theme.colors.border,
-            },
-          ]}
-        />
+        <TagChips tags={form.draft.tags} onChange={form.setTags} />
 
         <View style={styles.bakeRow}>
           <TextInput
@@ -338,6 +333,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 6,
   },
+  timestamp: { fontSize: 12, marginTop: -4 },
   field: {
     borderWidth: 1,
     borderRadius: 12,
