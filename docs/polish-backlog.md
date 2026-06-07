@@ -22,6 +22,14 @@
 
 ## Keyboard / Forms
 
+- [ ] **iOS で leave-guard の Cancel 後に戻るボタンが反応しなくなる。**
+  - 症状: 編集画面で変更あり → `<` → 「Save changes?」alert → Cancel → 編集画面に戻る → `<` をもう一度タップしても無反応。スワイプ back するとリスト方向に動くが、一瞬で alert が再表示される。
+  - 環境: iOS のみ（Android では問題なし）。Save / Discard / Delete 経路は正常。
+  - 仮説: `usePreventRemove` + iOS native-stack の組み合わせで、preventDefault した back イベントの状態が pop されず、次の back タップが内部で抑制される。
+  - 試したこと: alert の Cancel button に明示的な `onPress: () => {}` を追加 → 効果なし。
+  - 方針: React Navigation 側の挙動を要調査。代替として `dispatch(NavigationActions.preventDefault(false))` の手動解除や、`pop()` を Cancel で明示的に呼ばず別のフックで管理する案。今は致命的ではない（Save / Discard / Delete / スワイプ back は機能）ため後回し。
+  - 発見: `feature/recipe-form` 実機確認時。
+
 - [ ] **Android で入力欄が出現したキーボードに隠れたまま動かない。**
   - 原因: Expo の edge-to-edge UI と `softwareKeyboardLayoutMode` の組み合わせで `adjustResize`/`adjustPan` が効かない。`KeyboardAvoidingView` の `behavior="height"` を入れるとキーボード消滅後の safe area 計算が壊れる（focus 外したあと indicator bar と save bar が被る）副作用が出た。
   - 環境: Android（Expo Go）。iOS は `automaticallyAdjustKeyboardInsets` + `KeyboardAvoidingView (padding, offset 56)` で動作している。
