@@ -62,13 +62,23 @@ describe("scaleToFlour", () => {
     expect(scaleToFlour([ing("flour", 500, true)], Number.NaN)).toBeNull();
   });
 
-  it("rounds the scaled grams to integers", () => {
+  it("rounds the scaled grams to one decimal place", () => {
     const items = [ing("flour", 550, true), ing("water", 385, false)];
     const scaled = scaleToFlour(items, 560);
 
     expect(scaled).toEqual([
       { id: "flour", name: "flour", grams: 560, isFlour: true },
       { id: "water", name: "water", grams: 392, isFlour: false },
+    ]);
+  });
+
+  it("preserves a 0.1 g step when scaling", () => {
+    const items = [ing("flour", 100, true), ing("salt", 1.5, false)];
+    const scaled = scaleToFlour(items, 250);
+
+    expect(scaled).toEqual([
+      { id: "flour", name: "flour", grams: 250, isFlour: true },
+      { id: "salt", name: "salt", grams: 3.8, isFlour: false },
     ]);
   });
 });
