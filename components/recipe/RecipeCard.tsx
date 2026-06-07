@@ -1,3 +1,4 @@
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Image } from "expo-image";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Chip } from "@/components/ui/Chip";
@@ -32,8 +33,18 @@ export function RecipeCard({
         <Image source={{ uri: recipe.photoUri }} style={styles.thumb} />
       ) : (
         <View
-          style={[styles.thumb, { backgroundColor: theme.colors.border }]}
-        />
+          style={[
+            styles.thumb,
+            styles.thumbPlaceholder,
+            { backgroundColor: theme.colors.border },
+          ]}
+        >
+          <MaterialCommunityIcons
+            name="baguette"
+            size={24}
+            color={theme.colors.textSecondary}
+          />
+        </View>
       )}
       <View style={styles.body}>
         <Text style={[styles.name, { color: theme.colors.textPrimary }]}>
@@ -71,6 +82,7 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   thumb: { width: 56, height: 56, borderRadius: 12 },
+  thumbPlaceholder: { alignItems: "center", justifyContent: "center" },
   body: { flex: 1, gap: 6 },
   name: { fontSize: 18, fontWeight: "600" },
   preview: { fontSize: 13 },
