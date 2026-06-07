@@ -83,6 +83,18 @@ describe("useRecipeForm", () => {
     expect(result.current.draft.ingredients.length).toBe(before);
   });
 
+  it("sets and clears the photo uri", () => {
+    const { result } = renderHook(() => useRecipeForm(null));
+
+    expect(result.current.draft.photoUri).toBeUndefined();
+
+    act(() => result.current.setPhotoUri("file:///tmp/photo.jpg"));
+    expect(result.current.draft.photoUri).toBe("file:///tmp/photo.jpg");
+
+    act(() => result.current.setPhotoUri(undefined));
+    expect(result.current.draft.photoUri).toBeUndefined();
+  });
+
   it("does not change grams when there is no flour", () => {
     const initial = recipe([
       { id: "water", name: "水", grams: 100, isFlour: false },

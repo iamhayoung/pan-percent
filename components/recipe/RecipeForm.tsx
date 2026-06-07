@@ -17,6 +17,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FlourPanel } from "@/components/recipe/form/FlourPanel";
 import { IngredientRow } from "@/components/recipe/form/IngredientRow";
+import { PhotoPicker } from "@/components/recipe/form/PhotoPicker";
 import { TagChips } from "@/components/recipe/form/TagChips";
 import { bakerPercents } from "@/lib/bakers/calculate";
 import { formatDateTime } from "@/lib/i18n/formatDate";
@@ -121,6 +122,10 @@ export function RecipeForm({ initial }: { initial: Recipe | null }) {
         keyboardShouldPersistTaps="handled"
         automaticallyAdjustKeyboardInsets
       >
+        <PhotoPicker
+          photoUri={form.draft.photoUri}
+          onChange={form.setPhotoUri}
+        />
         <TextInput
           testID="recipe-name"
           value={form.draft.name}
