@@ -20,6 +20,7 @@ export const translations = {
     targetAmount: "Amount to make",
     addFlour: "Add flour",
     addIngredient: "Add ingredient",
+    addTag: "Add tag",
     tags: "Tags",
     bake: "Baking",
     temperatureC: "Temp (°C)",
@@ -28,6 +29,7 @@ export const translations = {
     discard: "Discard",
     unsavedTitle: "Save changes?",
     newRecipe: "New recipe",
+    lastUpdated: "Last updated {date}",
   },
   ja: {
     appName: "ぱんパーセント",
@@ -50,6 +52,7 @@ export const translations = {
     targetAmount: "作りたい量",
     addFlour: "粉を足す",
     addIngredient: "材料を足す",
+    addTag: "タグを足す",
     tags: "タグ",
     bake: "焼成",
     temperatureC: "温度 (°C)",
@@ -58,6 +61,7 @@ export const translations = {
     discard: "破棄",
     unsavedTitle: "変更を保存しますか？",
     newRecipe: "新しいレシピ",
+    lastUpdated: "最終更新 {date}",
   },
   ko: {
     appName: "빵 퍼센트",
@@ -80,6 +84,7 @@ export const translations = {
     targetAmount: "만들 양",
     addFlour: "가루 추가",
     addIngredient: "재료 추가",
+    addTag: "태그 추가",
     tags: "태그",
     bake: "굽기",
     temperatureC: "온도 (°C)",
@@ -88,6 +93,7 @@ export const translations = {
     discard: "버리기",
     unsavedTitle: "변경을 저장할까요?",
     newRecipe: "새 레시피",
+    lastUpdated: "{date} 최종 수정",
   },
 } as const;
 
