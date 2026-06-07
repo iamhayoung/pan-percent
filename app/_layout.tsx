@@ -32,7 +32,9 @@ function ThemedStack() {
         screenOptions={{
           headerBackButtonDisplayMode: "minimal",
           headerBackTitle: "",
+          headerLargeTitle: false,
           title: "",
+          headerTitleStyle: { fontSize: 18, fontWeight: "600" },
         }}
       >
         <Stack.Screen

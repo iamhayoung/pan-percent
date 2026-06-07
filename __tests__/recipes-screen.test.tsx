@@ -21,6 +21,9 @@ jest.mock("@react-navigation/native", () => {
 jest.mock("expo-localization", () => ({
   getLocales: () => [{ languageCode: "en" }],
 }));
+jest.mock("react-native-safe-area-context", () => ({
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}));
 jest.mock("expo-crypto", () => ({ randomUUID: jest.fn(() => "uuid-x") }));
 
 const draft = (name: string): RecipeDraft => ({

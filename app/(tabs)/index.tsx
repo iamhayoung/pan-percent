@@ -2,6 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
+import { ScreenHeader } from "@/components/layout/ScreenHeader";
 import { RecipeCard } from "@/components/recipe/RecipeCard";
 import { useT } from "@/lib/i18n/LanguageProvider";
 import { remove } from "@/lib/recipes/recipeRepository";
@@ -50,6 +51,7 @@ export default function RecipesScreen() {
     <View
       style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
+      <ScreenHeader title={t("tabRecipes")} />
       {recipes.length === 0 ? (
         <View style={styles.empty}>
           <Text style={{ color: theme.colors.textSecondary }}>
