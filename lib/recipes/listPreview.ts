@@ -3,7 +3,10 @@ import type { Recipe } from "@/types/recipe";
 const SEPARATOR = " · ";
 
 function formatNumber(value: number): string {
-  return Number.isInteger(value) ? String(value) : value.toFixed(1);
+  return value.toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 1,
+  });
 }
 
 export function buildListPreview(recipe: Recipe): string {

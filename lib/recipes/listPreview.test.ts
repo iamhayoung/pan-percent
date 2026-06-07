@@ -80,6 +80,17 @@ describe("buildListPreview", () => {
     expect(buildListPreview(r)).toBe("Bread flour 250.5g · Salt 1.5g");
   });
 
+  it("adds a thousands separator for large grams", () => {
+    const r = recipe({
+      ingredients: [
+        { id: "flour", name: "Bread flour", grams: 1500, isFlour: true },
+        { id: "water", name: "Water", grams: 12000, isFlour: false },
+      ],
+    });
+
+    expect(buildListPreview(r)).toBe("Bread flour 1,500g · Water 12,000g");
+  });
+
   it("preserves the user's names across locales", () => {
     const r = recipe({
       ingredients: [
