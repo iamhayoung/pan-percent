@@ -4,6 +4,8 @@ import { useRef } from "react";
 import {
   Alert,
   type AlertButton,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -96,7 +98,11 @@ export function RecipeForm({ initial }: { initial: Recipe | null }) {
   const saveBarHeight = 52 + bottomPad + 12;
 
   return (
-    <View style={[styles.root, { backgroundColor: theme.colors.background }]}>
+    <KeyboardAvoidingView
+      style={[styles.root, { backgroundColor: theme.colors.background }]}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 56 : 0}
+    >
       <ScrollView
         style={{ backgroundColor: theme.colors.background }}
         contentContainerStyle={[
@@ -104,6 +110,7 @@ export function RecipeForm({ initial }: { initial: Recipe | null }) {
           { paddingBottom: saveBarHeight + 16 },
         ]}
         keyboardShouldPersistTaps="handled"
+        automaticallyAdjustKeyboardInsets
       >
         <TextInput
           testID="recipe-name"
@@ -299,7 +306,7 @@ export function RecipeForm({ initial }: { initial: Recipe | null }) {
           </Text>
         </Pressable>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

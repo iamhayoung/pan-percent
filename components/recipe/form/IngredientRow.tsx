@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useT } from "@/lib/i18n/LanguageProvider";
 import { useTheme } from "@/lib/theme/useTheme";
 import type { Ingredient } from "@/types/recipe";
+import { NumberInput } from "./NumberInput";
 
 function toNumber(text: string): number {
   const n = Number(text);
@@ -53,13 +54,12 @@ export function IngredientRow({
         style={[styles.name, { color: theme.colors.textPrimary }]}
       />
       <View style={styles.numWrap}>
-        <TextInput
+        <NumberInput
           testID={`ingredient-grams-${id}`}
           textAlign="right"
           selectTextOnFocus
-          value={ingredient.grams > 0 ? String(ingredient.grams) : ""}
-          keyboardType="numeric"
-          onChangeText={(x) => onGrams(toNumber(x))}
+          value={ingredient.grams}
+          onChangeNumber={onGrams}
           placeholder="0"
           placeholderTextColor={theme.colors.textSecondary}
           style={[styles.num, { color: theme.colors.textPrimary }]}

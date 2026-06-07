@@ -3,13 +3,9 @@ import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useT } from "@/lib/i18n/LanguageProvider";
 import { useTheme } from "@/lib/theme/useTheme";
 import type { Ingredient } from "@/types/recipe";
+import { NumberInput } from "./NumberInput";
 
 const STEP = 10;
-
-function toNumber(text: string): number {
-  const n = Number(text);
-  return Number.isFinite(n) ? n : 0;
-}
 
 export function FlourPanel({
   flours,
@@ -71,13 +67,12 @@ export function FlourPanel({
           />
         </Pressable>
         <View style={styles.totalWrap}>
-          <TextInput
+          <NumberInput
             testID="total-flour-input"
             textAlign="right"
             selectTextOnFocus
-            value={totalFlour > 0 ? String(totalFlour) : ""}
-            keyboardType="numeric"
-            onChangeText={(x) => onScaleTotal(toNumber(x))}
+            value={totalFlour}
+            onChangeNumber={onScaleTotal}
             placeholder="0"
             placeholderTextColor={theme.colors.textSecondary}
             style={[styles.total, { color: theme.colors.textPrimary }]}
@@ -127,13 +122,12 @@ export function FlourPanel({
           />
           {blended && (
             <>
-              <TextInput
+              <NumberInput
                 testID={`flour-grams-${f.id}`}
                 textAlign="right"
                 selectTextOnFocus
-                value={f.grams > 0 ? String(f.grams) : ""}
-                keyboardType="numeric"
-                onChangeText={(x) => onFlourGrams(f.id, toNumber(x))}
+                value={f.grams}
+                onChangeNumber={(n) => onFlourGrams(f.id, n)}
                 placeholder="0"
                 placeholderTextColor={theme.colors.textSecondary}
                 style={[styles.flourGrams, { color: theme.colors.textPrimary }]}
