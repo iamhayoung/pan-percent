@@ -30,6 +30,13 @@ export const translations = {
     unsavedTitle: "Save changes?",
     newRecipe: "New recipe",
     lastUpdated: "Last updated {date}",
+    addPhoto: "Add photo",
+    takePhoto: "Take a photo",
+    pickFromLibrary: "Choose from library",
+    removePhoto: "Remove photo",
+    photoPermissionTitle: "Permission needed",
+    photoPermissionMessage:
+      "Please enable photo access in Settings to add a picture.",
   },
   ja: {
     appName: "ぱんパーセント",
@@ -62,6 +69,12 @@ export const translations = {
     unsavedTitle: "変更を保存しますか？",
     newRecipe: "新しいレシピ",
     lastUpdated: "最終更新 {date}",
+    addPhoto: "写真を追加",
+    takePhoto: "カメラで撮る",
+    pickFromLibrary: "ライブラリから選ぶ",
+    removePhoto: "写真を削除",
+    photoPermissionTitle: "権限が必要です",
+    photoPermissionMessage: "設定から写真アクセスを許可してください。",
   },
   ko: {
     appName: "빵 퍼센트",
@@ -94,6 +107,12 @@ export const translations = {
     unsavedTitle: "변경을 저장할까요?",
     newRecipe: "새 레시피",
     lastUpdated: "{date} 최종 수정",
+    addPhoto: "사진 추가",
+    takePhoto: "카메라로 촬영",
+    pickFromLibrary: "라이브러리에서 선택",
+    removePhoto: "사진 삭제",
+    photoPermissionTitle: "권한이 필요합니다",
+    photoPermissionMessage: "설정에서 사진 접근을 허용해 주세요.",
   },
 } as const;
 

@@ -25,6 +25,7 @@ export type RecipeFormApi = {
   setTags: (tags: string[]) => void;
   setBake: (bake: Bake | undefined) => void;
   setMemo: (memo: string) => void;
+  setPhotoUri: (photoUri: string | undefined) => void;
 };
 
 function isValidDraft(d: RecipeDraft): boolean {
@@ -137,5 +138,6 @@ export function useRecipeForm(initial: Recipe | null): RecipeFormApi {
     setTags: (tags) => setDraft((d) => ({ ...d, tags })),
     setBake: (bake) => setDraft((d) => ({ ...d, bake })),
     setMemo: (memo) => setDraft((d) => ({ ...d, memo })),
+    setPhotoUri: (photoUri) => setDraft((d) => ({ ...d, photoUri })),
   };
 }
