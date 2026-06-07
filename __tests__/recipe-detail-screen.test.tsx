@@ -12,16 +12,27 @@ import { list, save } from "@/lib/recipes/recipeRepository";
 import type { RecipeDraft } from "@/types/recipe";
 
 const mockBack = jest.fn();
+const mockAddListener = jest.fn(() => () => {});
+const mockDispatch = jest.fn();
 jest.mock("expo-router", () => ({
+  Stack: { Screen: () => null },
   useLocalSearchParams: () => ({ id: "uuid-x" }),
   useRouter: () => ({ back: mockBack }),
+  useNavigation: () => ({
+    addListener: mockAddListener,
+    dispatch: mockDispatch,
+  }),
 }));
 jest.mock("@react-navigation/native", () => {
   const react = require("react");
   return {
     useFocusEffect: (cb: () => void) => react.useEffect(() => cb(), [cb]),
+    usePreventRemove: jest.fn(),
   };
 });
+jest.mock("react-native-safe-area-context", () => ({
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}));
 jest.mock("expo-localization", () => ({
   getLocales: () => [{ languageCode: "en" }],
 }));
@@ -45,14 +56,16 @@ beforeEach(async () => {
 });
 
 describe("RecipeDetailScreen", () => {
-  it("shows the recipe and its baker percentages", async () => {
+  it("renders the recipe inside the editable form", async () => {
     await save(draft);
 
     renderWithProvider(<RecipeDetailScreen />);
 
-    await waitFor(() => expect(screen.getByText("Baguette")).toBeTruthy());
-    expect(screen.getByText("100%")).toBeTruthy();
-    expect(screen.getByText("70%")).toBeTruthy();
+    await waitFor(() =>
+      expect(screen.getByDisplayValue("Baguette")).toBeTruthy(),
+    );
+    expect(screen.getByDisplayValue("Water")).toBeTruthy();
+    expect(screen.getByDisplayValue("350")).toBeTruthy();
   });
 
   it("deletes after confirmation and navigates back", async () => {
@@ -65,9 +78,11 @@ describe("RecipeDetailScreen", () => {
       });
 
     renderWithProvider(<RecipeDetailScreen />);
-    await waitFor(() => expect(screen.getByText("Baguette")).toBeTruthy());
+    await waitFor(() =>
+      expect(screen.getByDisplayValue("Baguette")).toBeTruthy(),
+    );
 
-    fireEvent.press(screen.getByText("Delete"));
+    fireEvent.press(screen.getByTestId("delete-recipe"));
 
     await waitFor(() => expect(mockBack).toHaveBeenCalledTimes(1));
     expect(await list()).toEqual([]);

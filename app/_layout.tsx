@@ -28,9 +28,19 @@ function ThemedStack() {
   return (
     <ThemeProvider value={navigationTheme}>
       <StatusBar style="auto" />
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="recipe/[id]" options={{ title: "" }} />
+      <Stack
+        screenOptions={{
+          headerBackButtonDisplayMode: "minimal",
+          headerBackTitle: "",
+          title: "",
+        }}
+      >
+        <Stack.Screen
+          name="(tabs)"
+          options={{ headerShown: false, title: "" }}
+        />
+        <Stack.Screen name="recipe/[id]" />
+        <Stack.Screen name="recipe/new" />
       </Stack>
     </ThemeProvider>
   );
