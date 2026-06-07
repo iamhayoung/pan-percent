@@ -1,7 +1,9 @@
+import { usePreventRemove } from "@react-navigation/native";
 import { useNavigation, useRouter } from "expo-router";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import {
   Alert,
+  type AlertButton,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -9,6 +11,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FlourPanel } from "@/components/recipe/form/FlourPanel";
 import { IngredientRow } from "@/components/recipe/form/IngredientRow";
 import { bakerPercents } from "@/lib/bakers/calculate";
@@ -29,6 +32,7 @@ export function RecipeForm({ initial }: { initial: Recipe | null }) {
   const theme = useTheme();
   const router = useRouter();
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
   const savedRef = useRef(false);
 
   const persist = async () => {
@@ -36,29 +40,25 @@ export function RecipeForm({ initial }: { initial: Recipe | null }) {
     savedRef.current = true;
   };
 
-  useEffect(() => {
-    const sub = navigation.addListener("beforeRemove", (e) => {
-      if (!form.dirty || savedRef.current) {
-        return;
-      }
-      e.preventDefault();
-      Alert.alert(t("unsavedTitle"), undefined, [
-        { text: t("cancel"), style: "cancel" },
-        {
-          text: t("discard"),
-          style: "destructive",
-          onPress: () => navigation.dispatch(e.data.action),
+  usePreventRemove(form.dirty && !savedRef.current, ({ data }) => {
+    const buttons: AlertButton[] = [
+      { text: t("cancel"), style: "cancel" },
+      {
+        text: t("discard"),
+        style: "destructive",
+        onPress: () => navigation.dispatch(data.action),
+      },
+    ];
+    if (form.isValid) {
+      buttons.push({
+        text: t("save"),
+        onPress: async () => {
+          await persist();
+          navigation.dispatch(data.action);
         },
-        {
-          text: t("save"),
-          onPress: async () => {
-            await persist();
-            navigation.dispatch(e.data.action);
-          },
-        },
-      ]);
-    });
-    return sub;
+      });
+    }
+    Alert.alert(t("unsavedTitle"), undefined, buttons);
   });
 
   const handleSave = async () => {
@@ -91,153 +91,206 @@ export function RecipeForm({ initial }: { initial: Recipe | null }) {
     percents.find((p) => p.id === id)?.percent ?? null;
   const bake = form.draft.bake;
 
-  return (
-    <ScrollView
-      style={{ backgroundColor: theme.colors.background }}
-      contentContainerStyle={styles.content}
-      keyboardShouldPersistTaps="handled"
-    >
-      <TextInput
-        testID="recipe-name"
-        value={form.draft.name}
-        onChangeText={form.setName}
-        placeholder={t("recipeName")}
-        placeholderTextColor={theme.colors.textSecondary}
-        style={[styles.nameInput, { color: theme.colors.textPrimary }]}
-      />
+  const canSave = form.dirty && form.isValid;
+  const bottomPad = insets.bottom + 12;
+  const saveBarHeight = 52 + bottomPad + 12;
 
-      <FlourPanel
-        flours={flours}
-        totalFlour={form.totalFlour}
-        onScaleTotal={form.scaleTotalFlour}
-        onFlourGrams={form.setIngredientGrams}
-        onFlourName={form.setIngredientName}
-        onAddFlour={form.addFlour}
-      />
+  return (
+    <View style={[styles.root, { backgroundColor: theme.colors.background }]}>
+      <ScrollView
+        style={{ backgroundColor: theme.colors.background }}
+        contentContainerStyle={[
+          styles.content,
+          { paddingBottom: saveBarHeight + 16 },
+        ]}
+        keyboardShouldPersistTaps="handled"
+      >
+        <TextInput
+          testID="recipe-name"
+          value={form.draft.name}
+          onChangeText={form.setName}
+          placeholder={t("recipeName")}
+          placeholderTextColor={theme.colors.textSecondary}
+          style={[styles.nameInput, { color: theme.colors.textPrimary }]}
+        />
+
+        <FlourPanel
+          flours={flours}
+          totalFlour={form.totalFlour}
+          onScaleTotal={form.scaleTotalFlour}
+          onFlourGrams={form.setIngredientGrams}
+          onFlourName={form.setIngredientName}
+          onAddFlour={form.addFlour}
+          onRemoveFlour={form.removeIngredient}
+        />
+
+        <View
+          style={[
+            styles.panel,
+            {
+              backgroundColor: theme.colors.surface,
+              borderColor: theme.colors.border,
+            },
+          ]}
+        >
+          <Text style={[styles.label, { color: theme.colors.textSecondary }]}>
+            {t("ingredients")}
+          </Text>
+          {others.map((ingredient, index) => (
+            <IngredientRow
+              key={ingredient.id}
+              ingredient={ingredient}
+              percent={percentOf(ingredient.id)}
+              percentEditable={form.totalFlour > 0}
+              removable={index > 0}
+              onName={(name) => form.setIngredientName(ingredient.id, name)}
+              onGrams={(grams) => form.setIngredientGrams(ingredient.id, grams)}
+              onPercent={(p) => form.setIngredientPercent(ingredient.id, p)}
+              onRemove={() => form.removeIngredient(ingredient.id)}
+            />
+          ))}
+          <Pressable
+            testID="add-ingredient"
+            accessibilityRole="button"
+            onPress={form.addIngredient}
+            style={[styles.addRow, { borderColor: theme.colors.border }]}
+          >
+            <Text style={{ color: theme.colors.accent }}>
+              ＋ {t("addIngredient")}
+            </Text>
+          </Pressable>
+        </View>
+
+        <TextInput
+          testID="tags-input"
+          value={form.draft.tags.join(", ")}
+          onChangeText={(x) =>
+            form.setTags(
+              x
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean),
+            )
+          }
+          placeholder={t("tags")}
+          placeholderTextColor={theme.colors.textSecondary}
+          style={[
+            styles.field,
+            {
+              color: theme.colors.textPrimary,
+              borderColor: theme.colors.border,
+            },
+          ]}
+        />
+
+        <View style={styles.bakeRow}>
+          <TextInput
+            testID="bake-temp"
+            selectTextOnFocus
+            value={bake?.temperatureC != null ? String(bake.temperatureC) : ""}
+            keyboardType="numeric"
+            onChangeText={(x) =>
+              form.setBake({
+                ...bake,
+                temperatureC: x === "" ? undefined : toNumber(x),
+              })
+            }
+            placeholder={t("temperatureC")}
+            placeholderTextColor={theme.colors.textSecondary}
+            style={[
+              styles.field,
+              styles.bakeField,
+              {
+                color: theme.colors.textPrimary,
+                borderColor: theme.colors.border,
+              },
+            ]}
+          />
+          <TextInput
+            testID="bake-min"
+            selectTextOnFocus
+            value={bake?.minutes != null ? String(bake.minutes) : ""}
+            keyboardType="numeric"
+            onChangeText={(x) =>
+              form.setBake({
+                ...bake,
+                minutes: x === "" ? undefined : toNumber(x),
+              })
+            }
+            placeholder={t("minutes")}
+            placeholderTextColor={theme.colors.textSecondary}
+            style={[
+              styles.field,
+              styles.bakeField,
+              {
+                color: theme.colors.textPrimary,
+                borderColor: theme.colors.border,
+              },
+            ]}
+          />
+        </View>
+
+        <TextInput
+          testID="memo-input"
+          value={form.draft.memo ?? ""}
+          onChangeText={form.setMemo}
+          placeholder={t("memo")}
+          placeholderTextColor={theme.colors.textSecondary}
+          multiline
+          style={[
+            styles.field,
+            styles.memo,
+            {
+              color: theme.colors.textPrimary,
+              borderColor: theme.colors.border,
+            },
+          ]}
+        />
+
+        {initial !== null && (
+          <Pressable
+            testID="delete-recipe"
+            accessibilityRole="button"
+            accessibilityLabel={t("delete")}
+            onPress={handleDelete}
+            style={[styles.delete, { borderColor: theme.colors.danger }]}
+          >
+            <Text style={{ color: theme.colors.danger, fontWeight: "600" }}>
+              {t("delete")}
+            </Text>
+          </Pressable>
+        )}
+      </ScrollView>
 
       <View
         style={[
-          styles.panel,
+          styles.saveBar,
           {
-            backgroundColor: theme.colors.surface,
-            borderColor: theme.colors.border,
+            backgroundColor: theme.colors.background,
+            borderTopColor: theme.colors.border,
+            paddingBottom: bottomPad,
           },
         ]}
       >
-        <Text style={[styles.label, { color: theme.colors.textSecondary }]}>
-          {t("ingredients")}
-        </Text>
-        {others.map((ingredient) => (
-          <IngredientRow
-            key={ingredient.id}
-            ingredient={ingredient}
-            percent={percentOf(ingredient.id)}
-            onName={(name) => form.setIngredientName(ingredient.id, name)}
-            onGrams={(grams) => form.setIngredientGrams(ingredient.id, grams)}
-            onPercent={(p) => form.setIngredientPercent(ingredient.id, p)}
-            onRemove={() => form.removeIngredient(ingredient.id)}
-          />
-        ))}
-        <Pressable
-          testID="add-ingredient"
-          accessibilityRole="button"
-          onPress={form.addIngredient}
-          style={[styles.addRow, { borderColor: theme.colors.border }]}
-        >
-          <Text style={{ color: theme.colors.accent }}>
-            ＋ {t("addIngredient")}
-          </Text>
-        </Pressable>
-      </View>
-
-      <TextInput
-        testID="tags-input"
-        value={form.draft.tags.join(", ")}
-        onChangeText={(x) =>
-          form.setTags(
-            x
-              .split(",")
-              .map((s) => s.trim())
-              .filter(Boolean),
-          )
-        }
-        placeholder={t("tags")}
-        placeholderTextColor={theme.colors.textSecondary}
-        style={[
-          styles.field,
-          { color: theme.colors.textPrimary, borderColor: theme.colors.border },
-        ]}
-      />
-
-      <View style={styles.bakeRow}>
-        <TextInput
-          testID="bake-temp"
-          value={bake?.temperatureC != null ? String(bake.temperatureC) : ""}
-          keyboardType="numeric"
-          onChangeText={(x) =>
-            form.setBake({
-              ...bake,
-              temperatureC: x === "" ? undefined : toNumber(x),
-            })
-          }
-          placeholder={t("temperatureC")}
-          placeholderTextColor={theme.colors.textSecondary}
-          style={[
-            styles.field,
-            styles.bakeField,
-            {
-              color: theme.colors.textPrimary,
-              borderColor: theme.colors.border,
-            },
-          ]}
-        />
-        <TextInput
-          testID="bake-min"
-          value={bake?.minutes != null ? String(bake.minutes) : ""}
-          keyboardType="numeric"
-          onChangeText={(x) =>
-            form.setBake({
-              ...bake,
-              minutes: x === "" ? undefined : toNumber(x),
-            })
-          }
-          placeholder={t("minutes")}
-          placeholderTextColor={theme.colors.textSecondary}
-          style={[
-            styles.field,
-            styles.bakeField,
-            {
-              color: theme.colors.textPrimary,
-              borderColor: theme.colors.border,
-            },
-          ]}
-        />
-      </View>
-
-      <TextInput
-        testID="memo-input"
-        value={form.draft.memo ?? ""}
-        onChangeText={form.setMemo}
-        placeholder={t("memo")}
-        placeholderTextColor={theme.colors.textSecondary}
-        multiline
-        style={[
-          styles.field,
-          styles.memo,
-          { color: theme.colors.textPrimary, borderColor: theme.colors.border },
-        ]}
-      />
-
-      {form.dirty && (
         <Pressable
           testID="save-recipe"
           accessibilityRole="button"
+          disabled={!canSave}
           onPress={handleSave}
-          style={[styles.save, { backgroundColor: theme.colors.accent }]}
+          style={[
+            styles.save,
+            {
+              backgroundColor: canSave
+                ? theme.colors.accent
+                : theme.colors.border,
+            },
+          ]}
         >
           <Text
             style={{
-              color: theme.colors.accentText,
+              color: canSave
+                ? theme.colors.accentText
+                : theme.colors.textSecondary,
               fontWeight: "700",
               fontSize: theme.fontSize.lg,
             }}
@@ -245,27 +298,23 @@ export function RecipeForm({ initial }: { initial: Recipe | null }) {
             {t("save")}
           </Text>
         </Pressable>
-      )}
-
-      {initial !== null && (
-        <Pressable
-          testID="delete-recipe"
-          accessibilityRole="button"
-          accessibilityLabel={t("delete")}
-          onPress={handleDelete}
-          style={[styles.delete, { borderColor: theme.colors.danger }]}
-        >
-          <Text style={{ color: theme.colors.danger, fontWeight: "600" }}>
-            {t("delete")}
-          </Text>
-        </Pressable>
-      )}
-    </ScrollView>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  root: { flex: 1 },
   content: { padding: 16, gap: 14 },
+  saveBar: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    borderTopWidth: 1,
+  },
   nameInput: { fontSize: 22, fontWeight: "700", paddingVertical: 6 },
   panel: { borderWidth: 1, borderRadius: 12, padding: 12, gap: 4 },
   label: { fontSize: 12 },

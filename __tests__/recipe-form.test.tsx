@@ -12,19 +12,26 @@ import { list, save } from "@/lib/recipes/recipeRepository";
 import type { Recipe } from "@/types/recipe";
 
 const mockBack = jest.fn();
-const mockAddListener = jest.fn(() => jest.fn());
 jest.mock("expo-router", () => ({
   useRouter: () => ({ back: mockBack }),
   useNavigation: () => ({
-    addListener: mockAddListener,
     setOptions: jest.fn(),
     dispatch: jest.fn(),
   }),
 }));
+jest.mock("@react-navigation/native", () => ({
+  usePreventRemove: jest.fn(),
+}));
+jest.mock("react-native-safe-area-context", () => ({
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}));
 jest.mock("expo-localization", () => ({
   getLocales: () => [{ languageCode: "en" }],
 }));
-jest.mock("expo-crypto", () => ({ randomUUID: jest.fn(() => "uuid-new") }));
+let mockIdn = 0;
+jest.mock("expo-crypto", () => ({
+  randomUUID: jest.fn(() => `id-${++mockIdn}`),
+}));
 
 const existing: Recipe = {
   id: "r1",
@@ -44,6 +51,7 @@ const renderWithProvider = (ui: React.ReactElement) =>
 beforeEach(async () => {
   await AsyncStorage.clear();
   jest.clearAllMocks();
+  mockIdn = 0;
 });
 
 describe("RecipeForm", () => {
@@ -62,14 +70,25 @@ describe("RecipeForm", () => {
     expect(screen.getByDisplayValue("Water")).toBeTruthy();
   });
 
-  it("shows the save button only after a change, and saves", async () => {
+  it("keeps the save button disabled until dirty and valid, then saves", async () => {
     renderWithProvider(<RecipeForm initial={null} />);
-    expect(screen.queryByTestId("save-recipe")).toBeNull();
+    const saveBtn = () => screen.getByTestId("save-recipe");
+
+    expect(saveBtn().props.accessibilityState?.disabled).toBe(true);
 
     fireEvent.changeText(screen.getByTestId("recipe-name"), "My bread");
-    expect(screen.getByTestId("save-recipe")).toBeTruthy();
+    expect(saveBtn().props.accessibilityState?.disabled).toBe(true);
 
-    fireEvent.press(screen.getByTestId("save-recipe"));
+    fireEvent.changeText(screen.getByTestId("flour-name-id-1"), "Bread flour");
+    fireEvent.changeText(screen.getByTestId("total-flour-input"), "500");
+    expect(saveBtn().props.accessibilityState?.disabled).toBe(true);
+
+    fireEvent.changeText(screen.getByTestId("ingredient-name-id-2"), "Water");
+    fireEvent.changeText(screen.getByTestId("ingredient-grams-id-2"), "350");
+
+    expect(saveBtn().props.accessibilityState?.disabled).toBe(false);
+
+    fireEvent.press(saveBtn());
 
     await waitFor(() => expect(mockBack).toHaveBeenCalled());
     const saved = await list();
