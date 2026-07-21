@@ -1,12 +1,9 @@
-import { useHeaderHeight } from "@react-navigation/elements";
 import { usePreventRemove } from "@react-navigation/native";
 import { useNavigation, useRouter } from "expo-router";
 import { useRef } from "react";
 import {
   Alert,
   type AlertButton,
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -39,7 +36,6 @@ export function RecipeForm({ initial }: { initial: Recipe | null }) {
   const router = useRouter();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  const headerHeight = useHeaderHeight();
   const savedRef = useRef(false);
   const savingRef = useRef(false);
 
@@ -108,11 +104,7 @@ export function RecipeForm({ initial }: { initial: Recipe | null }) {
   const saveBarHeight = 52 + bottomPad + 12;
 
   return (
-    <KeyboardAvoidingView
-      style={[styles.root, { backgroundColor: theme.colors.background }]}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? headerHeight : 0}
-    >
+    <View style={[styles.root, { backgroundColor: theme.colors.background }]}>
       <ScrollView
         style={{ backgroundColor: theme.colors.background }}
         contentContainerStyle={[
@@ -326,7 +318,7 @@ export function RecipeForm({ initial }: { initial: Recipe | null }) {
           </Text>
         </Pressable>
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
