@@ -19,12 +19,13 @@ jest.mock("expo-router", () => ({
     dispatch: jest.fn(),
   }),
 }));
-jest.mock("@react-navigation/native", () => ({
-  usePreventRemove: jest.fn(),
-}));
-jest.mock("react-native-safe-area-context", () => ({
-  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
-}));
+jest.mock("@react-navigation/native", () => {
+  const react = require("react");
+  return {
+    usePreventRemove: jest.fn(),
+    useFocusEffect: (cb: () => void) => react.useEffect(() => cb(), [cb]),
+  };
+});
 jest.mock("expo-localization", () => ({
   getLocales: () => [{ languageCode: "en" }],
 }));
@@ -80,10 +81,12 @@ describe("RecipeForm", () => {
     expect(saveBtn().props.accessibilityState?.disabled).toBe(true);
 
     fireEvent.changeText(screen.getByTestId("flour-name-id-1"), "Bread flour");
+
     fireEvent.changeText(screen.getByTestId("total-flour-input"), "500");
     expect(saveBtn().props.accessibilityState?.disabled).toBe(true);
 
     fireEvent.changeText(screen.getByTestId("ingredient-name-id-2"), "Water");
+
     fireEvent.changeText(screen.getByTestId("ingredient-grams-id-2"), "350");
 
     expect(saveBtn().props.accessibilityState?.disabled).toBe(false);
@@ -94,6 +97,14 @@ describe("RecipeForm", () => {
     const saved = await list();
     expect(saved).toHaveLength(1);
     expect(saved[0].name).toBe("My bread");
+  });
+
+  it("captures yield input", () => {
+    renderWithProvider(<RecipeForm initial={null} />);
+
+    fireEvent.changeText(screen.getByTestId("recipe-yield"), "1斤型1つ分");
+
+    expect(screen.getByDisplayValue("1斤型1つ分")).toBeTruthy();
   });
 
   it("deletes an existing recipe after confirmation", async () => {

@@ -34,7 +34,9 @@ describe("IngredientRow", () => {
     );
 
     expect(screen.getByDisplayValue("Water")).toBeTruthy();
+
     fireEvent.changeText(screen.getByTestId("ingredient-name-water"), "Milk");
+
     expect(onName).toHaveBeenCalledWith("Milk");
   });
 

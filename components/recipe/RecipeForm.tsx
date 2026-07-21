@@ -195,6 +195,21 @@ export function RecipeForm({ initial }: { initial: Recipe | null }) {
 
         <TagChips tags={form.draft.tags} onChange={form.setTags} />
 
+        <TextInput
+          testID="recipe-yield"
+          value={form.draft.yield ?? ""}
+          onChangeText={form.setYield}
+          placeholder={t("yieldPlaceholder")}
+          placeholderTextColor={theme.colors.textSecondary}
+          style={[
+            styles.field,
+            {
+              color: theme.colors.textPrimary,
+              borderColor: theme.colors.border,
+            },
+          ]}
+        />
+
         <View style={styles.bakeRow}>
           <TextInput
             testID="bake-temp"
