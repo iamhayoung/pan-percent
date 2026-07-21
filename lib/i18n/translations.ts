@@ -37,6 +37,7 @@ export const translations = {
     photoPermissionTitle: "Permission needed",
     photoPermissionMessage:
       "Please enable photo access in Settings to add a picture.",
+    yieldPlaceholder: "1 loaf pan, 8 pieces",
   },
   ja: {
     appName: "ぱんパーセント",
@@ -75,6 +76,7 @@ export const translations = {
     removePhoto: "写真を削除",
     photoPermissionTitle: "権限が必要です",
     photoPermissionMessage: "設定から写真アクセスを許可してください。",
+    yieldPlaceholder: "1斤型1つ分、8個分",
   },
   ko: {
     appName: "빵 퍼센트",
@@ -113,6 +115,7 @@ export const translations = {
     removePhoto: "사진 삭제",
     photoPermissionTitle: "권한이 필요합니다",
     photoPermissionMessage: "설정에서 사진 접근을 허용해 주세요.",
+    yieldPlaceholder: "식빵틀 1개 분량, 8개분",
   },
 } as const;
 

@@ -91,6 +91,31 @@ describe("buildListPreview", () => {
     expect(buildListPreview(r)).toBe("Bread flour 1,500g · Water 12,000g");
   });
 
+  it("prepends yield when present", () => {
+    const r = recipe({
+      yield: "1斤型1つ分",
+      ingredients: [
+        { id: "flour", name: "Bread flour", grams: 500, isFlour: true },
+        { id: "water", name: "Water", grams: 350, isFlour: false },
+      ],
+    });
+
+    expect(buildListPreview(r)).toBe(
+      "1斤型1つ分 · Bread flour 500g · Water 350g",
+    );
+  });
+
+  it("ignores blank yield", () => {
+    const r = recipe({
+      yield: "   ",
+      ingredients: [
+        { id: "flour", name: "Bread flour", grams: 500, isFlour: true },
+      ],
+    });
+
+    expect(buildListPreview(r)).toBe("Bread flour 500g");
+  });
+
   it("preserves the user's names across locales", () => {
     const r = recipe({
       ingredients: [

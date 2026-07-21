@@ -11,6 +11,7 @@ export type Recipe = {
   ingredients: Ingredient[];
   memo?: string;
   photoUri?: string;
+  yield?: string;
   tags: string[];
   bake?: { temperatureC?: number; minutes?: number };
   createdAt: number;

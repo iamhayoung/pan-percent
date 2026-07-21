@@ -83,6 +83,18 @@ describe("useRecipeForm", () => {
     expect(result.current.draft.ingredients.length).toBe(before);
   });
 
+  it("sets and clears yield text", () => {
+    const { result } = renderHook(() => useRecipeForm(null));
+
+    expect(result.current.draft.yield).toBeUndefined();
+
+    act(() => result.current.setYield("1斤型1つ分"));
+    expect(result.current.draft.yield).toBe("1斤型1つ分");
+
+    act(() => result.current.setYield(""));
+    expect(result.current.draft.yield).toBe("");
+  });
+
   it("sets and clears the photo uri", () => {
     const { result } = renderHook(() => useRecipeForm(null));
 
