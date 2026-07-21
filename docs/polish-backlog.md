@@ -38,10 +38,23 @@
   - 発見: `feature/recipe-form` 実機確認時。
 
 - [ ] **Android で入力欄が出現したキーボードに隠れたまま動かない。**
-  - 原因: Expo の edge-to-edge UI と `softwareKeyboardLayoutMode` の組み合わせで `adjustResize`/`adjustPan` が効かない。`KeyboardAvoidingView` の `behavior="height"` を入れるとキーボード消滅後の safe area 計算が壊れる（focus 外したあと indicator bar と save bar が被る）副作用が出た。
-  - 環境: Android（Expo Go）。iOS は `automaticallyAdjustKeyboardInsets` + `KeyboardAvoidingView (padding, offset 56)` で動作している。
+  - 原因: Android は `adjustResize`（Expo 既定）でウィンドウは縮むが、focused input への自動スクロールが無い。`automaticallyAdjustKeyboardInsets` は iOS 限定で Android では効かない。以前 `KeyboardAvoidingView behavior="height"` を試すとキーボード消滅後の safe area 計算が壊れる（indicator bar と save bar が被る）副作用が出た。
+  - 環境: Android。
   - 方針: dev client セットアップ後に `react-native-keyboard-controller` の `KeyboardAwareScrollView` を導入する。Expo Go では native module を含まないため動かない。
-  - 発見: `feature/recipe-form` 実機確認時。
+  - 発見: `feature/recipe-form` 実機時 →（再確認）`feature/recipe-yield` 実機時も同様。
+
+- [ ] **iOS でフォーカス時、削除ボタン下に余分なスクロールが少し残る／フォーカス欄が十分に上がりきらない。**
+  - 経緯: 2026-07-22、`RecipeForm` が iOS で二重にキーボード回避していた（`KeyboardAvoidingView` padding ＋ ScrollView `automaticallyAdjustKeyboardInsets`）ため、フォーカス時に削除ボタン下へキーボード高さの約 2 倍の余分スクロールが発生していた。KAV を撤去して `automaticallyAdjustKeyboardInsets` 一本にしたら、Android は完全解消・iOS も大幅減。
+  - 残: iOS はまだ削除ボタン下に少し余分が残り、focused 欄の自動スクロールも弱い（欄が十分に上がりきらない）。
+  - 仮説: `automaticallyAdjustKeyboardInsets` 単体では contentInset とスクロール量が最適化しきれない。safe-area / saveBar 高さ分の余白が絡む可能性。
+  - 方針: `react-native-keyboard-controller`（KeyboardAwareScrollView）導入でまとめて解決。それまで現状維持。
+  - 発見: `feature/recipe-yield` 実機時。
+
+- [ ] **入力中、最下部の Save バーがキーボード裏に隠れる（KAV 撤去のトレードオフ）。**
+  - 経緯: 上記 KAV 撤去（2026-07-22）により、以前は KAV padding でキーボード上へせり上がっていた Save バーが、フォーカス中は隠れるようになった（blur で戻る）。
+  - 環境: iOS（Android は元々せり上がらない）。一般的挙動なので許容範囲。
+  - 方針: 入力中も Save を見せたい場合は `react-native-keyboard-controller` の `KeyboardStickyView` で追従させる。
+  - 発見: `feature/recipe-yield` 実機時。
 
 ## Color / Branding
 
